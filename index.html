@@ -1385,7 +1385,7 @@
                             <span>${date}</span>
                         </div>
                         ${tagsHtml ? `<div class="memory-tags">${tagsHtml}</div>` : ''}
-                        <div class="memory-actions ${isAdmin ? 'show' : ''}">
+                        <div class="memory-actions" style="display: ${isAdmin ? 'flex' : 'none'};">
                             <button class="btn btn-secondary btn-small" onclick="editMemory('${memory.id}', event)">Edit</button>
                             <button class="btn btn-danger btn-small" onclick="deleteMemory('${memory.id}', event)">Delete</button>
                         </div>
