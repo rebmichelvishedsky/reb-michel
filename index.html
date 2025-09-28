@@ -987,9 +987,6 @@
                     // Reset form
                     resetForm();
                     
-                    // Send email notification
-                    sendEmailNotification(memoryData);
-                    
                     // Refresh displays
                     if (document.getElementById('home-section').style.display !== 'none') {
                         loadRecentMemories();
@@ -1006,7 +1003,6 @@
                 
                 showAlert('Memory shared successfully! It is now live on the website.', 'success');
                 resetForm();
-                sendEmailNotification(memoryData);
                 
                 if (document.getElementById('home-section').style.display !== 'none') {
                     loadRecentMemories();
@@ -1034,25 +1030,6 @@
             setTimeout(() => {
                 alertDiv.innerHTML = '';
             }, 5000);
-        }
-
-        // Send email notification
-        async function sendEmailNotification(memoryData) {
-            try {
-                const response = await fetch('/.netlify/functions/submit-memory', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(memoryData)
-                });
-                
-                if (!response.ok) {
-                    console.error('Failed to send email notification');
-                }
-            } catch (error) {
-                console.error('Error sending email notification:', error);
-            }
         }
 
         // Create memory card HTML
