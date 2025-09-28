@@ -1091,6 +1091,12 @@
                 if (memoryData.tags && memoryData.tags.length > 0) {
                     payload.fields.Tags = memoryData.tags.join(', ');
                 }
+                
+                if (memoryData.fileData) {
+                    payload.fields.FileData = memoryData.fileData.data;
+                    payload.fields.FileName = memoryData.fileData.name;
+                    payload.fields.FileType = memoryData.fileData.type;
+                }
 
                 console.log('Payload being sent:', JSON.stringify(payload, null, 2)); // Debug log
 
@@ -1312,9 +1318,17 @@
                 } else if (fileInput.files[0] && memoryData.type !== 'youtube' && memoryData.type !== 'voice') {
                     const reader = new FileReader();
                     reader.onload = async function(e) {
-                        // For non-YouTube files, append file info to description
+                        // For non-YouTube files, store the actual file data
                         const fileName = fileInput.files[0].name;
                         const fileType = fileInput.files[0].type;
+
+                        memoryData.fileData = {
+                            name: fileName,
+                            type: fileType,
+                            data: e.target.result
+                        };
+
+                        memoryData.description += `\n\n[Attached: ${fileName}]`;
                         
                         memoryData.description += `\n\n[File: ${fileName} (${fileType}) - Contact admin to view attachment]`;
                         
@@ -1395,6 +1409,14 @@
                     if (videoId) {
                         mediaHtml = `<iframe class="memory-video" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
                     }
+                }
+            } else if (memory.FileData && memory.FileType) {
+                if (memory.FileType.startsWith('image/')) {
+                    mediaHtml = `<img src="${memory.FileData}" alt="${title}" class="memory-media">`;
+                } else if (memory.FileType.startsWith('video/')) {
+                    mediaHtml = `<video class="memory-video" controls><source src="${memory.FileData}" type="${memory.FileType}"></video>`;
+                } else if (memory.FileType.startsWith('audio/')) {
+                    mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${memory.FileData}" type="${memory.FileType}"></audio>`;
                 }
             } else if (memory.Attachment && memory.Attachment.length > 0) {
                 const attachment = memory.Attachment[0];
@@ -1554,6 +1576,14 @@
                     if (videoId) {
                         mediaHtml = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
                     }
+                }
+            } else if (memory.FileData && memory.FileType) {
+                if (memory.FileType.startsWith('image/')) {
+                    mediaHtml = `<img src="${memory.FileData}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
+                } else if (memory.FileType.startsWith('video/')) {
+                    mediaHtml = `<video width="100%" height="315" controls><source src="${memory.FileData}" type="${memory.FileType}"></video>`;
+                } else if (memory.FileType.startsWith('audio/')) {
+                    mediaHtml = `<audio controls style="width: 100%;"><source src="${memory.FileData}" type="${memory.FileType}"></audio>`;
                 }
             } else if (memory.Attachment && memory.Attachment.length > 0) {
                 const attachment = memory.Attachment[0];
