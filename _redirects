@@ -1,0 +1,15 @@
+# Netlify redirects file
+# Handle memory links
+/memory/* /index.html#memory=:splat 200
+
+# Admin panel redirect
+/admin /index.html#admin 200
+
+# Form submission handling
+/submit-memory /.netlify/functions/submit-memory 200
+
+# API endpoints
+/api/* /.netlify/functions/:splat 200
+
+# Fallback for all other routes
+/* /index.html 200
