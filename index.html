@@ -988,6 +988,7 @@
             AIRTABLE_CONFIG.apiKey = apiKey;
             
             showConfigStatus('Database configuration saved successfully!', 'success');
+            testAirtableConnection();
         }
 
         // Test Airtable connection
@@ -1031,10 +1032,22 @@
             }, 5000);
         }
 
-        // Initialize Airtable API key from environment
         async function initializeAirtable() {
-            // Load configuration from localStorage
-            initializeAirtableConfig();
+            // Try to fetch from Vercel function that returns environment variables
+            try {
+                const response = await fetch('/api/get-config');
+                if (response.ok) {
+                    const config = await response.json();
+                    AIRTABLE_CONFIG.apiKey = config.AIRTABLE_API_KEY;
+                    AIRTABLE_CONFIG.baseId = config.AIRTABLE_BASE_ID;
+                } else {
+                    // Fallback to localStorage if the API fails
+                    initializeAirtableConfig();
+                }
+            } catch (error) {
+                console.warn('Could not load configuration from environment. Falling back to localStorage.');
+                initializeAirtableConfig();
+            }
         }
 
         // Airtable API functions
@@ -1626,6 +1639,7 @@
                 
                 // Initialize Airtable configuration in admin panel
                 initializeAirtableConfig();
+                testAirtableConnection();
                 
                 updateAdminStats();
                 loadExistingTags();
