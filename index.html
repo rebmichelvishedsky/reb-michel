@@ -782,6 +782,19 @@
                             <input type="text" id="submitter-name" name="submitter">
                         </div>
 
+                        <div class="form-group" id="voice-group" style="display: none;">
+                            <label id="voice-label">Record Voice Note</label>
+                            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+                                <button type="button" class="btn btn-primary" id="start-record">🎤 Start</button>
+                                <button type="button" class="btn btn-secondary" id="pause-record" disabled>⏸️ Pause</button>
+                                <button type="button" class="btn btn-danger" id="stop-record" disabled>⏹️ Stop</button>
+                                <button type="button" class="btn btn-secondary" id="play-record" disabled>▶️ Play</button>
+                                <span id="record-time">0:00</span>
+                            </div>
+                            <audio id="recorded-audio" controls style="width: 100%; display: none;"></audio>
+                            <p id="record-status" style="color: var(--accent-color); font-size: 14px;">Click Start to begin recording</p>
+                        </div>
+
                         <div class="form-group">
                             <label for="submitter-email" id="email-label">Your Email (Optional)</label>
                             <input type="email" id="submitter-email" name="email">
@@ -922,6 +935,12 @@
         let isAdmin = false;
         let availableTags = [];
         let currentEditingMemory = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordedBlob = null;
+        let recordingTimer = null;
+        let recordingSeconds = 0;
+        let isPaused = false;
 
         // Initialize Airtable configuration
         function initializeAirtableConfig() {
@@ -1226,13 +1245,20 @@
         document.getElementById('memory-type').addEventListener('change', function() {
             const fileGroup = document.getElementById('file-group');
             const youtubeGroup = document.getElementById('youtube-group');
+            const voiceGroup = document.getElementById('voice-group');
+
+            // Hide all input types first
+            fileGroup.style.display = 'none';
+            youtubeGroup.style.display = 'none';
+            voiceGroup.style.display = 'none';
             
             if (this.value === 'youtube') {
                 fileGroup.style.display = 'none';
                 youtubeGroup.style.display = 'block';
+            } else if (this.value === 'voice') {
+                voiceGroup.style.display = 'block';
             } else {
                 fileGroup.style.display = 'block';
-                youtubeGroup.style.display = 'none';
             }
         });
 
@@ -1270,7 +1296,20 @@
 
                 // Handle file upload - store as base64 in description for now
                 const fileInput = document.getElementById('memory-file');
-                if (fileInput.files[0] && memoryData.type !== 'youtube') {
+                if (memoryData.type === 'voice' && recordedBlob) {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        memoryData.description += `\n\n[Voice Note: ${Math.floor(recordingSeconds/60)}:${(recordingSeconds%60).toString().padStart(2,'0')} duration - Contact admin to add audio file]`;
+        
+                        const newMemory = await saveMemoryToAirtable(memoryData);
+                        memories.unshift(newMemory);
+        
+                        showAlert('Voice note shared successfully! Audio noted - admin can add to Airtable manually.', 'success');
+                        resetForm();
+                        refreshCurrentView();
+                    };
+                    reader.readAsDataURL(recordedBlob);
+                } else if (fileInput.files[0] && memoryData.type !== 'youtube' && memoryData.type !== 'voice') {
                     const reader = new FileReader();
                     reader.onload = async function(e) {
                         // For non-YouTube files, append file info to description
@@ -1715,9 +1754,110 @@
             }
         }
 
+        // Voice recording functionality
+        function initializeVoiceRecording() {
+            const startBtn = document.getElementById('start-record');
+            const pauseBtn = document.getElementById('pause-record');
+            const stopBtn = document.getElementById('stop-record');
+            const playBtn = document.getElementById('play-record');
+            const statusText = document.getElementById('record-status');
+            const timeDisplay = document.getElementById('record-time');
+            const audioElement = document.getElementById('recorded-audio');
+
+            startBtn.addEventListener('click', async function() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    audioChunks = [];
+                    recordingSeconds = 0;
+            
+                    mediaRecorder = new MediaRecorder(stream);
+            
+                    mediaRecorder.ondataavailable = function(event) {
+                         audioChunks.push(event.data);
+                    };
+            
+                    mediaRecorder.onstop = function() {
+                         recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                         const audioUrl = URL.createObjectURL(recordedBlob);
+                         audioElement.src = audioUrl;
+                         audioElement.style.display = 'block';
+                
+                         // Stop all tracks
+                         stream.getTracks().forEach(track => track.stop());
+                    };
+            
+                    mediaRecorder.start();
+            
+                    // Update UI
+                    startBtn.disabled = true;
+                    pauseBtn.disabled = false;
+                    stopBtn.disabled = false;
+                    statusText.textContent = 'Recording...';
+            
+                    // Start timer
+                    recordingTimer = setInterval(() => {
+                         recordingSeconds++;
+                         const minutes = Math.floor(recordingSeconds / 60);
+                         const seconds = recordingSeconds % 60;
+                         timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    }, 1000);
+            
+                } catch (error) {
+                    statusText.textContent = 'Error: Could not access microphone';
+                }
+            });
+
+            pauseBtn.addEventListener('click', function() {
+                if (mediaRecorder && !isPaused) {
+                    mediaRecorder.pause();
+                    isPaused = true;
+                    pauseBtn.textContent = '▶️ Resume';
+                    statusText.textContent = 'Recording paused';
+                    clearInterval(recordingTimer);
+                } else if (mediaRecorder && isPaused) {
+                    mediaRecorder.resume();
+                    isPaused = false;
+                    pauseBtn.textContent = '⏸️ Pause';
+                    statusText.textContent = 'Recording...';
+                    recordingTimer = setInterval(() => {
+                        recordingSeconds++;
+                        const minutes = Math.floor(recordingSeconds / 60);
+                        const seconds = recordingSeconds % 60;
+                        timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    }, 1000);
+                }
+            });
+
+            stopBtn.addEventListener('click', function() {
+                if (mediaRecorder) {
+                    mediaRecorder.stop();
+                    clearInterval(recordingTimer);
+
+                    // Update UI
+                    startBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                    stopBtn.disabled = true;
+                    playBtn.disabled = false;
+                    pauseBtn.disabled = true;
+                    stopBtn.disabled = true;
+                    playBtn.disabled = false;
+                    statusText.textContent = 'Recording complete. Click Play to review.';
+                    isPaused = false;
+                    pauseBtn.textContent = '⏸️ Pause';
+                }
+            });
+
+            playBtn.addEventListener('click', function() {
+                if (audioElement.src) {
+                    audioElement.play();
+                }
+            });
+        }
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', async function() {
             await initializeAirtable();
+            initializeVoiceRecording();
             
             // Check if admin is logged in
             if (localStorage.getItem('isAdmin') === 'true') {
