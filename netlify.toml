@@ -1,15 +1,9 @@
 [build]
   publish = "."
-  command = "echo 'No build command needed for static site'"
+  command = ""
 
 [functions]
   directory = "netlify/functions"
-
-[[forms]]
-  name = "memory-submission"
-
-[build.environment]
-  NODE_VERSION = "18"
 
 [[headers]]
   for = "/*"
