@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memorial for Reb Michel Vishedsky - הרב מיכל וישצקי</title>
+    <style>
+        :root {
+            --primary-color: #f8f9fa;
+            --secondary-color: #e9ecef;
+            --text-color: #333;
+            --border-color: #d1d5db;
+            --accent-color: #6b7280;
+            --hover-color: #f3f4f6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* Hebrew support */
+        [dir="rtl"] {
+            text-align: right;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px 0;
+            margin-bottom: 40px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo h1 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: var(--text-color);
+        }
+
+        .hebrew-name {
+            font-size: 1.2rem;
+            color: var(--accent-color);
+            direction: rtl;
+        }
+
+        /* Language Toggle */
+        .lang-toggle {
+            display: flex;
+            gap: 10px;
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            background: white;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--hover-color);
+        }
+
+        /* Admin Controls */
+        .admin-controls {
+            display: none;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .admin-controls.show {
+            display: flex;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--hover-color);
+        }
+
+        /* Navigation */
+        nav {
+            background: var(--secondary-color);
+            padding: 15px 0;
+            margin-bottom: 40px;
+        }
+
+        .nav-menu {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-item {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            min-height: 60vh;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .upload-form {
+            display: grid;
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        input, textarea, select {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .file-input {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .file-input input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 20px;
+            border: 2px dashed var(--border-color);
+            border-radius: 6px;
+            text-align: center;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .file-input:hover .file-input-label {
+            border-color: var(--accent-color);
+            background: var(--hover-color);
+        }
+
+        /* Memory Grid */
+        .memories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .memory-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .memory-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .memory-media {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .memory-content {
+            padding: 20px;
+        }
+
+        .memory-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--text-color);
+        }
+
+        .memory-description {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .memory-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--accent-color);
+        }
+
+        .memory-tags {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: var(--secondary-color);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+
+        .admin-panel.show {
+            display: block;
+        }
+
+        .admin-login {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .admin-dashboard {
+            display: none;
+        }
+
+        .admin-dashboard.show {
+            display: block;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+        }
+
+        /* Footer */
+        footer {
+            background: white;
+            border-top: 1px solid var(--border-color);
+            padding: 30px 0;
+            margin-top: 60px;
+            text-align: center;
+            color: var(--accent-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .nav-menu {
+                gap: 15px;
+            }
+
+            .memories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .upload-form {
+                padding: 20px;
+            }
+        }
+
+        /* Hebrew RTL Styles */
+        .hebrew {
+            direction: rtl;
+            text-align: right;
+        }
+
+        .hebrew .header-content {
+            flex-direction: row-reverse;
+        }
+
+        .hebrew .nav-menu {
+            flex-direction: row-reverse;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div>
+                        <h1 id="main-title">Memorial for Reb Michel Vishedsky</h1>
+                        <div class="hebrew-name">הרב מיכל וישצקי</div>
+                    </div>
+                </div>
+                <div class="lang-toggle">
+                    <button class="lang-btn active" onclick="setLanguage('en')">English</button>
+                    <button class="lang-btn" onclick="setLanguage('he')">עברית</button>
+                </div>
+                <div class="admin-controls">
+                    <button class="btn btn-secondary" onclick="showAdminPanel()" id="admin-btn">Admin</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <div class="nav-menu">
+                <a href="#" class="nav-item active" onclick="showSection('home')" id="nav-home">Home</a>
+                <a href="#" class="nav-item" onclick="showSection('memories')" id="nav-memories">Memories</a>
+                <a href="#" class="nav-item" onclick="showSection('share')" id="nav-share">Share Memory</a>
+                <a href="#" class="nav-item" onclick="showSection('about')" id="nav-about">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="admin-panel">
+            <div class="admin-login" id="admin-login">
+                <h2 id="admin-title">Admin Access</h2>
+                <div class="form-group">
+                    <input type="password" id="admin-password" placeholder="Enter admin password">
+                </div>
+                <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+            </div>
+            
+            <div class="admin-dashboard" id="admin-dashboard">
+                <h2>Admin Dashboard</h2>
+                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                    <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+                    <button class="btn btn-secondary" onclick="manageMemories()">Manage Memories</button>
+                    <button class="btn btn-secondary" onclick="adminLogout()">Logout</button>
+                </div>
+                <div id="admin-content"></div>
+            </div>
+        </div>
+
+        <!-- Main Sections -->
+        <div class="main-content">
+            <!-- Home Section -->
+            <div id="home-section" class="section">
+                <div style="text-align: center; margin-bottom: 40px;">
+                    <h2 id="welcome-title">In loving memory of Reb Michel Vishedsky</h2>
+                    <p id="welcome-text" style="font-size: 1.1rem; color: var(--accent-color); margin-top: 20px;">
+                        A place to share and preserve cherished memories, stories, and moments that celebrate his life and legacy.
+                    </p>
+                </div>
+
+                <div class="memories-grid" id="recent-memories">
+                    <!-- Recent memories will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Memories Section -->
+            <div id="memories-section" class="section" style="display: none;">
+                <div style="margin-bottom: 30px;">
+                    <h2 id="memories-title">All Memories</h2>
+                    <div style="display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;">
+                        <select id="tag-filter">
+                            <option value="">All Categories</option>
+                        </select>
+                        <input type="text" id="search-memories" placeholder="Search memories...">
+                    </div>
+                </div>
+                <div class="memories-grid" id="all-memories">
+                    <!-- All memories will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Share Memory Section -->
+            <div id="share-section" class="section" style="display: none;">
+                <div class="upload-section">
+                    <h2 id="share-title" style="text-align: center; margin-bottom: 30px;">Share a Memory</h2>
+                    <form class="upload-form" name="memory-submission" method="POST" data-netlify="true" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="memory-type" id="type-label">Type of Memory</label>
+                            <select id="memory-type" name="type" required>
+                                <option value="">Select type...</option>
+                                <option value="photo">Photo</option>
+                                <option value="video">Video</option>
+                                <option value="youtube">YouTube Video</option>
+                                <option value="story">Written Story</option>
+                                <option value="voice">Voice Note</option>
+                                <option value="document">Document</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memory-title" id="title-label">Title</label>
+                            <input type="text" id="memory-title" name="title" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memory-description" id="description-label">Description or Story</label>
+                            <textarea id="memory-description" name="description" required></textarea>
+                        </div>
+
+                        <div class="form-group" id="file-group">
+                            <label id="file-label">Upload File</label>
+                            <div class="file-input">
+                                <input type="file" id="memory-file" name="file" accept="*/*">
+                                <label for="memory-file" class="file-input-label">
+                                    <span id="file-text">Click to select or drag file here</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="youtube-group" style="display: none;">
+                            <label for="youtube-url" id="youtube-label">YouTube URL</label>
+                            <input type="url" id="youtube-url" name="youtube" placeholder="https://www.youtube.com/watch?v=...">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="submitter-name" id="name-label">Your Name (Optional)</label>
+                            <input type="text" id="submitter-name" name="submitter">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="submitter-email" id="email-label">Your Email (Optional)</label>
+                            <input type="email" id="submitter-email" name="email">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" id="submit-btn">Share Memory</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div id="about-section" class="section" style="display: none;">
+                <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <h2 id="about-title">About Reb Michel Vishedsky</h2>
+                    <div id="about-content">
+                        <p>This memorial website is dedicated to preserving and sharing the precious memories of Reb Michel Vishedsky (הרב מיכל וישצקי).</p>
+                        <p>Here, family, friends, and all those whose lives he touched can share photos, videos, stories, and memories that celebrate his life, teachings, and the impact he had on our community.</p>
+                        <p>Every memory shared here contributes to keeping his legacy alive for future generations.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory Detail Modal -->
+    <div class="modal" id="memory-modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="modal-title">Memory Details</h3>
+                <button onclick="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+            </div>
+            <div id="modal-content">
+                <!-- Memory details will be loaded here -->
+            </div>
+            <div style="margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="shareMemory()" id="share-btn">Share This Memory</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p id="footer-text">In loving memory of Reb Michel Vishedsky - הרב מיכל וישצקי</p>
+            <p id="contact-text">Contact: rebmichelvishedsky@gmail.com</p>
+        </div>
+    </footer>
+
+    <script>
+        // Language system
+        const translations = {
+            en: {
+                'main-title': 'Memorial for Reb Michel Vishedsky',
+                'admin-btn': 'Admin',
+                'nav-home': 'Home',
+                'nav-memories': 'Memories',
+                'nav-share': 'Share Memory',
+                'nav-about': 'About',
+                'welcome-title': 'In loving memory of Reb Michel Vishedsky',
+                'welcome-text': 'A place to share and preserve cherished memories, stories, and moments that celebrate his life and legacy.',
+                'memories-title': 'All Memories',
+                'share-title': 'Share a Memory',
+                'type-label': 'Type of Memory',
+                'title-label': 'Title',
+                'description-label': 'Description or Story',
+                'file-label': 'Upload File',
+                'file-text': 'Click to select or drag file here',
+                'youtube-label': 'YouTube URL',
+                'name-label': 'Your Name (Optional)',
+                'email-label': 'Your Email (Optional)',
+                'submit-btn': 'Share Memory',
+                'about-title': 'About Reb Michel Vishedsky',
+                'footer-text': 'In loving memory of Reb Michel Vishedsky - הרב מיכל וישצקי',
+                'contact-text': 'Contact: rebmichelvishedsky@gmail.com'
+            },
+            he: {
+                'main-title': 'לזכר הרב מיכל וישצקי',
+                'admin-btn': 'מנהל',
+                'nav-home': 'בית',
+                'nav-memories': 'זכרונות',
+                'nav-share': 'שתף זכרון',
+                'nav-about': 'אודות',
+                'welcome-title': 'לזכר הרב מיכל וישצקי',
+                'welcome-text': 'מקום לשתף ולשמר זכרונות יקרים, סיפורים ורגעים שחוגגים את חייו ומורשתו.',
+                'memories-title': 'כל הזכרונות',
+                'share-title': 'שתף זכרון',
+                'type-label': 'סוג הזכרון',
+                'title-label': 'כותרת',
+                'description-label': 'תיאור או סיפור',
+                'file-label': 'העלה קובץ',
+                'file-text': 'לחץ לבחירה או גרור קובץ כאן',
+                'youtube-label': 'קישור יוטיוב',
+                'name-label': 'שמך (אופציונלי)',
+                'email-label': 'האימייל שלך (אופציונלי)',
+                'submit-btn': 'שתף זכרון',
+                'about-title': 'אודות הרב מיכל וישצקי',
+                'footer-text': 'לזכר הרב מיכל וישצקי',
+                'contact-text': 'יצירת קשר: rebmichelvishedsky@gmail.com'
+            }
+        };
+
+        let currentLanguage = 'en';
+        let memories = [];
+        let isAdmin = false;
+
+        // Language switching
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            document.body.className = lang === 'he' ? 'hebrew' : '';
+            document.body.dir = lang === 'he' ? 'rtl' : 'ltr';
+            
+            // Update all translatable elements
+            Object.keys(translations[lang]).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    if (element.tagName === 'INPUT' && element.type === 'text') {
+                        element.placeholder = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+
+            // Update active language button
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Section navigation
+        function showSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+            
+            // Show selected section
+            document.getElementById(section + '-section').style.display = 'block';
+            
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('nav-' + section).classList.add('active');
+
+            // Load content based on section
+            if (section === 'memories') {
+                loadAllMemories();
+            } else if (section === 'home') {
+                loadRecentMemories();
+            }
+        }
+
+        // Memory type handler
+        document.getElementById('memory-type').addEventListener('change', function() {
+            const fileGroup = document.getElementById('file-group');
+            const youtubeGroup = document.getElementById('youtube-group');
+            
+            if (this.value === 'youtube') {
+                fileGroup.style.display = 'none';
+                youtubeGroup.style.display = 'block';
+            } else {
+                fileGroup.style.display = 'block';
+                youtubeGroup.style.display = 'none';
+            }
+        });
+
+        // File upload handler
+        document.getElementById('memory-file').addEventListener('change', function() {
+            const fileName = this.files[0] ? this.files[0].name : 'Click to select or drag file here';
+            document.getElementById('file-text').textContent = fileName;
+        });
+
+        // Form submission
+        document.querySelector('form[name="memory-submission"]').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Show success message
+            alert('Thank you for sharing your memory! It will be reviewed and added to the website.');
+            
+            // Reset form
+            this.reset();
+            document.getElementById('file-text').textContent = 'Click to select or drag file here';
+            document.getElementById('file-group').style.display = 'block';
+            document.getElementById('youtube-group').style.display = 'none';
+        });
+
+        // Admin functions
+        function showAdminPanel() {
+            document.getElementById('admin-panel').classList.add('show');
+        }
+
+        function adminLogin() {
+            const password = document.getElementById('admin-password').value;
+            // In real implementation, this would be properly secured
+            if (password === 'admin123') {
+                isAdmin = true;
+                document.getElementById('admin-login').style.display = 'none';
+                document.getElementById('admin-dashboard').classList.add('show');
+                document.querySelector('.admin-controls').classList.add('show');
+            } else {
+                alert('Incorrect password');
+            }
+        }
+
+        function adminLogout() {
+            isAdmin = false;
+            document.getElementById('admin-panel').classList.remove('show');
+            document.getElementById('admin-login').style.display = 'block';
+            document.getElementById('admin-dashboard').classList.remove('show');
+            document.querySelector('.admin-controls').classList.remove('show');
+            document.getElementById('admin-password').value = '';
+        }
+
+        function exportData() {
+            // This would export all memories data
+            alert('Data export functionality would be implemented here');
+        }
+
+        function manageMemories() {
+            // This would show memory management interface
+            alert('Memory management interface would be implemented here');
+        }
+
+        // Memory loading functions (placeholder)
+        function loadRecentMemories() {
+            const container = document.getElementById('recent-memories');
+            container.innerHTML = '<p style="text-align: center; color: var(--accent-color);">Recent memories will appear here as they are shared.</p>';
+        }
+
+        function loadAllMemories() {
+            const container = document.getElementById('all-memories');
+            container.innerHTML = '<p style="text-align: center; color: var(--accent-color);">All memories will appear here as they are shared.</p>';
+        }
+
+        // Modal functions
+        function closeModal() {
+            document.getElementById('memory-modal').classList.remove('show');
+        }
+
+        function shareMemory() {
+            const url = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Memorial Memory',
+                    url: url
+                });
+            } else {
+                navigator.clipboard.writeText(url).then(() => {
+                    alert('Link copied to clipboard!');
+                });
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('home');
+            
+            // Show admin controls if admin is logged in
+            if (localStorage.getItem('isAdmin') === 'true') {
+                document.querySelector('.admin-controls').classList.add('show');
+                isAdmin = true;
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('memory-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
