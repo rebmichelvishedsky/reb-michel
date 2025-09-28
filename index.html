@@ -1056,26 +1056,24 @@
 
         async function saveMemoryToAirtable(memoryData) {
             try {
+                console.log('Sending to Airtable:', memoryData); // Debug log
+                
                 const payload = {
-                    fields: {
-                        Title: memoryData.title,
-                        Description: memoryData.description,
-                        Type: memoryData.type,
-                        YouTube: memoryData.youtube || '',
-                        Submitter: memoryData.submitter,
-                        Email: memoryData.email || '',
-                        Tags: memoryData.tags ? memoryData.tags.join(', ') : '',
-                        Created: new Date().toISOString()
-                    }
+                    fields: {}
                 };
 
-                // Handle file attachments
-                if (memoryData.file && memoryData.type !== 'youtube') {
-                    payload.fields.Attachment = [{
-                        url: memoryData.file.data,
-                        filename: memoryData.file.name
-                    }];
+                // Only send fields that have values
+                if (memoryData.title) payload.fields.Title = memoryData.title;
+                if (memoryData.description) payload.fields.Description = memoryData.description;
+                if (memoryData.type) payload.fields.Type = memoryData.type;
+                if (memoryData.submitter) payload.fields.Submitter = memoryData.submitter;
+                if (memoryData.email) payload.fields.Email = memoryData.email;
+                if (memoryData.youtube) payload.fields.YouTube = memoryData.youtube;
+                if (memoryData.tags && memoryData.tags.length > 0) {
+                    payload.fields.Tags = memoryData.tags.join(', ');
                 }
+
+                console.log('Payload being sent:', JSON.stringify(payload, null, 2)); // Debug log
 
                 const response = await fetch(
                     `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}`,
@@ -1090,18 +1088,27 @@
                 );
 
                 if (!response.ok) {
-                    throw new Error(`Failed to save memory: ${response.status}`);
+                    const errorData = await response.json();
+                    console.error('Airtable API Error Details:', errorData);
+                    throw new Error(`Airtable error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
                 }
 
                 const newRecord = await response.json();
+                console.log('Airtable response:', newRecord); // Debug log
+                
                 return {
                     id: newRecord.id,
-                    ...newRecord.fields,
-                    timestamp: newRecord.fields.Created,
+                    Title: newRecord.fields.Title,
+                    Description: newRecord.fields.Description,
+                    Type: newRecord.fields.Type,
+                    YouTube: newRecord.fields.YouTube,
+                    Submitter: newRecord.fields.Submitter,
+                    Email: newRecord.fields.Email,
+                    timestamp: newRecord.createdTime,
                     tags: newRecord.fields.Tags ? newRecord.fields.Tags.split(',').map(tag => tag.trim()) : []
                 };
             } catch (error) {
-                console.error('Error saving memory:', error);
+                console.error('Detailed error in saveMemoryToAirtable:', error);
                 throw error;
             }
         }
@@ -1258,25 +1265,25 @@
                     submitter: formData.get('submitter') || 'Anonymous',
                     email: formData.get('email') || '',
                     tags: [],
-                    file: null
+                    fileData: null
                 };
 
-                // Handle file upload (convert to base64 for storage)
+                // Handle file upload - store as base64 in description for now
                 const fileInput = document.getElementById('memory-file');
                 if (fileInput.files[0] && memoryData.type !== 'youtube') {
                     const reader = new FileReader();
                     reader.onload = async function(e) {
-                        memoryData.file = {
-                            name: fileInput.files[0].name,
-                            type: fileInput.files[0].type,
-                            data: e.target.result
-                        };
+                        // For non-YouTube files, append file info to description
+                        const fileName = fileInput.files[0].name;
+                        const fileType = fileInput.files[0].type;
+                        
+                        memoryData.description += `\n\n[File: ${fileName} (${fileType}) - Contact admin to view attachment]`;
                         
                         // Save to Airtable
                         const newMemory = await saveMemoryToAirtable(memoryData);
                         memories.unshift(newMemory);
                         
-                        showAlert('Memory shared successfully! It is now live on the website.', 'success');
+                        showAlert('Memory shared successfully! File noted - admin can add attachment to Airtable manually.', 'success');
                         resetForm();
                         refreshCurrentView();
                     };
