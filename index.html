@@ -392,9 +392,6 @@
             gap: 10px;
         }
 
-        .memory-actions.show {
-            display: flex;
-        }
 
         .btn-small {
             padding: 6px 12px;
@@ -756,12 +753,12 @@
 
                         <div class="form-group">
                             <label for="memory-title" id="title-label">Title</label>
-                            <input type="text" id="memory-title" name="title" required>
+                            <input type="text" id="memory-title" name="title">
                         </div>
 
                         <div class="form-group">
                             <label for="memory-description" id="description-label">Description or Story</label>
-                            <textarea id="memory-description" name="description" required></textarea>
+                            <textarea id="memory-description" name="description"></textarea>
                         </div>
 
                         <div class="form-group" id="file-group">
@@ -1337,10 +1334,6 @@
                             type: fileType,
                             data: e.target.result
                         };
-
-                        memoryData.description += `\n\n[Attached: ${fileName}]`;
-                        
-                        memoryData.description += `\n\n[File: ${fileName} (${fileType}) - Contact admin to view attachment]`;
                         
                         // Save to Airtable
                         const newMemory = await saveMemoryToAirtable(memoryData);
@@ -1645,11 +1638,7 @@
                 
                 updateAdminStats();
                 loadExistingTags();
-                
-                // Show admin controls on memory cards
-                document.querySelectorAll('.memory-actions').forEach(actions => {
-                    actions.classList.add('show');
-                });
+                refreshCurrentView();
             } else {
                 alert('Incorrect password');
             }
@@ -1662,11 +1651,7 @@
             document.getElementById('admin-login').style.display = 'block';
             document.getElementById('admin-dashboard').classList.remove('show');
             document.getElementById('admin-password').value = '';
-            
-            // Hide admin controls on memory cards
-            document.querySelectorAll('.memory-actions').forEach(actions => {
-                actions.classList.remove('show');
-            });
+            refreshCurrentView();
         }
 
         function updateAdminStats() {
