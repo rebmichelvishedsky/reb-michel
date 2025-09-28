@@ -31,14 +31,24 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Email configuration (using environment variables)
+    // IMPORTANT: These must be set as environment variables in Netlify dashboard
+    // NEVER hardcode actual passwords here
+    if (!process.env.GMAIL_USER || !process.env.GMAIL_PASS) {
+      console.error('Gmail credentials not configured in environment variables');
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'Email configuration missing' }),
+      };
+    }
+
+    // Email configuration (using environment variables ONLY)
     const transporter = nodemailer.createTransporter({
       host: 'smtp.gmail.com',
       port: 587,
       secure: false,
       auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_PASS,
+        user: process.env.GMAIL_USER,    // Set in Netlify dashboard
+        pass: process.env.GMAIL_PASS,    // Set in Netlify dashboard
       },
     });
 
@@ -64,23 +74,6 @@ Submitted on: ${new Date().toLocaleString()}
       text: emailContent,
     });
 
-    // Store data (in real implementation, save to database)
-    const memoryData = {
-      id: Date.now().toString(),
-      type,
-      title,
-      description,
-      youtube,
-      submitter: submitter || 'Anonymous',
-      email,
-      timestamp: new Date().toISOString(),
-      approved: false
-    };
-
-    // In real implementation, save to database
-    // For now, just log it
-    console.log('Memory submitted:', memoryData);
-
     return {
       statusCode: 200,
       headers: {
@@ -89,8 +82,7 @@ Submitted on: ${new Date().toLocaleString()}
       },
       body: JSON.stringify({ 
         success: true, 
-        message: 'Memory submitted successfully',
-        id: memoryData.id
+        message: 'Memory submitted successfully'
       }),
     };
 
