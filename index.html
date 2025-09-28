@@ -638,23 +638,25 @@
             <div class="admin-dashboard" id="admin-dashboard">
                 <h2>Admin Dashboard</h2>
                 
-                <!-- Airtable Configuration -->
-                <div class="tag-manager" style="margin-bottom: 30px;">
-                    <h3>Database Configuration</h3>
-                    <div style="display: grid; gap: 15px;">
-                        <div class="form-group">
-                            <label>Airtable Base ID:</label>
-                            <input type="text" id="base-id-input" placeholder="appXXXXXXXXXXXXXX" value="">
+                <!-- Airtable Configuration (Hidden) -->
+                <div style="display: none;">
+                    <div class="tag-manager" style="margin-bottom: 30px;">
+                        <h3>Database Configuration</h3>
+                        <div style="display: grid; gap: 15px;">
+                            <div class="form-group">
+                                <label>Airtable Base ID:</label>
+                                <input type="text" id="base-id-input" placeholder="appXXXXXXXXXXXXXX" value="">
+                            </div>
+                            <div class="form-group">
+                                <label>Airtable API Key:</label>
+                                <input type="password" id="api-key-input" placeholder="patXXXXXXXXXXXXXX" value="">
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" onclick="saveAirtableConfig()">Save Database Config</button>
+                                <button class="btn btn-secondary" onclick="testAirtableConnection()">Test Connection</button>
+                            </div>
+                            <div id="config-status"></div>
                         </div>
-                        <div class="form-group">
-                            <label>Airtable API Key:</label>
-                            <input type="password" id="api-key-input" placeholder="patXXXXXXXXXXXXXX" value="">
-                        </div>
-                        <div>
-                            <button class="btn btn-primary" onclick="saveAirtableConfig()">Save Database Config</button>
-                            <button class="btn btn-secondary" onclick="testAirtableConnection()">Test Connection</button>
-                        </div>
-                        <div id="config-status"></div>
                     </div>
                 </div>
                 
