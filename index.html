@@ -1123,12 +1123,7 @@
                 
                 return {
                     id: newRecord.id,
-                    Title: newRecord.fields.Title,
-                    Description: newRecord.fields.Description,
-                    Type: newRecord.fields.Type,
-                    YouTube: newRecord.fields.YouTube,
-                    Submitter: newRecord.fields.Submitter,
-                    Email: newRecord.fields.Email,
+                    ...newRecord.fields,
                     timestamp: newRecord.createdTime,
                     tags: newRecord.fields.Tags ? newRecord.fields.Tags.split(',').map(tag => tag.trim()) : []
                 };
@@ -1635,10 +1630,8 @@
                 updateAdminStats();
                 loadExistingTags();
                 
-                // Show admin controls on memory cards
-                document.querySelectorAll('.memory-actions').forEach(actions => {
-                    actions.classList.add('show');
-                });
+                // Re-render memories to show admin controls
+                refreshCurrentView();
             } else {
                 alert('Incorrect password');
             }
@@ -1652,10 +1645,8 @@
             document.getElementById('admin-dashboard').classList.remove('show');
             document.getElementById('admin-password').value = '';
             
-            // Hide admin controls on memory cards
-            document.querySelectorAll('.memory-actions').forEach(actions => {
-                actions.classList.remove('show');
-            });
+            // Re-render memories to hide admin controls
+            refreshCurrentView();
         }
 
         function updateAdminStats() {
