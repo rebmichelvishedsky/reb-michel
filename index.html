@@ -1503,9 +1503,9 @@
             // Filter by search term
             if (searchTerm) {
                 filteredMemories = filteredMemories.filter(memory =>
-                    memory.Title.toLowerCase().includes(searchTerm) ||
-                    memory.Description.toLowerCase().includes(searchTerm) ||
-                    memory.Submitter.toLowerCase().includes(searchTerm)
+                    (memory.Title || '').toLowerCase().includes(searchTerm) ||
+                    (memory.Description || '').toLowerCase().includes(searchTerm) ||
+                    (memory.Submitter || '').toLowerCase().includes(searchTerm)
                 );
             }
             
