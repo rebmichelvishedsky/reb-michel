@@ -1,0 +1,35 @@
+[build]
+  publish = "."
+  command = "echo 'No build command needed for static site'"
+
+[functions]
+  directory = "netlify/functions"
+
+[[forms]]
+  name = "memory-submission"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+
+[[redirects]]
+  from = "/memory/:id"
+  to = "/index.html#memory=:id"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/index.html#admin"
+  status = 200
