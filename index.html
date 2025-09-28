@@ -1630,8 +1630,10 @@
                 updateAdminStats();
                 loadExistingTags();
                 
-                // Re-render memories to show admin controls
-                refreshCurrentView();
+                // Show admin controls on memory cards
+                document.querySelectorAll('.memory-actions').forEach(actions => {
+                    actions.classList.add('show');
+                });
             } else {
                 alert('Incorrect password');
             }
@@ -1645,8 +1647,10 @@
             document.getElementById('admin-dashboard').classList.remove('show');
             document.getElementById('admin-password').value = '';
             
-            // Re-render memories to hide admin controls
-            refreshCurrentView();
+            // Hide admin controls on memory cards
+            document.querySelectorAll('.memory-actions').forEach(actions => {
+                actions.classList.remove('show');
+            });
         }
 
         function updateAdminStats() {
