@@ -599,9 +599,6 @@
                     <button class="lang-btn active" onclick="setLanguage('en')">English</button>
                     <button class="lang-btn" onclick="setLanguage('he')">עברית</button>
                 </div>
-                <div class="admin-controls">
-                    <button class="btn btn-secondary" onclick="showAdminPanel()" id="admin-btn">Admin</button>
-                </div>
             </div>
         </div>
     </header>
@@ -878,13 +875,26 @@
         </div>
     </div>
 
-    <footer>
+    <footer onclick="footerClickCount()">
         <div class="container">
             <p id="footer-text">In loving memory of Reb Michel Vishedsky ע"ה</p>
             <p id="contact-text">Contact: rebmichelvishedsky@gmail.com</p>
         </div>
     </footer>
 
+    <script>
+        let footerClicks = 0;
+        function footerClickCount() {
+            footerClicks++;
+            if (footerClicks === 3) {
+                showAdminPanel();
+                footerClicks = 0;
+            }
+            // Reset counter after 2 seconds of no clicks
+            setTimeout(() => footerClicks = 0, 2000);
+        }
+    </script>
+    
     <script>
     // ============================================
     // CLOUDINARY CONFIGURATION
