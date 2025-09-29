@@ -317,6 +317,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: transform 0.3s ease;
             position: relative;
+            min-height: auto;
         }
 
         .memory-card:hover {
@@ -348,10 +349,6 @@
         .memory-description {
             color: var(--accent-color);
             margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
         }
 
         .memory-meta {
@@ -756,6 +753,7 @@
 
                         <div class="form-group">
                             <label for="memory-description" id="description-label">Description or Story</label>
+                            <p style="font-size: 0.9rem; color: var(--light-text); margin-bottom: 8px;">Use *text* for bold and _text_ for italic</p>
                             <textarea id="memory-description" name="description"></textarea>
                         </div>
 
@@ -1440,6 +1438,14 @@
             }
         }
 
+        // Create format text for bold an italic
+        function formatText(text) {
+            return text
+            .replace(/\*([^*]+)\*/g, '<strong>$1</strong>')
+            .replace(/_([^_]+)_/g, '<em>$1</em>')
+            .replace(/\n/g, '<br>');
+        }
+        
         // Create memory card HTML
         function createMemoryCard(memory) {
             console.log('Creating card for memory:', memory); // Debug log
@@ -1484,7 +1490,7 @@
 
             const tagsHtml = tags.map(tag => `<span class="tag" onclick="filterByTag('${tag}')">${tag}</span>`).join('');
             
-            const description = memory.Description || memory.description || '';
+            const description = formatText(memory.Description || memory.description || '');
             const submitter = memory.Submitter || memory.submitter || 'Anonymous';
             
             return `
@@ -1653,7 +1659,7 @@
             const tags = memory.tags || [];
             const tagsHtml = tags.map(tag => `<span class="tag">${tag}</span>`).join('');
             
-            const description = memory.Description || memory.description || '';
+            const description = formatText(memory.Description || memory.description || '');
             const submitter = memory.Submitter || memory.submitter || 'Anonymous';
             
             content.innerHTML = `
@@ -1661,7 +1667,7 @@
                 <h2 style="margin: 20px 0 10px 0;">${title}</h2>
                 <p style="color: var(--accent-color); margin-bottom: 15px;">Shared by ${submitter} on ${date}</p>
                 ${tagsHtml ? `<div style="margin-bottom: 15px;">${tagsHtml}</div>` : ''}
-                <p style="line-height: 1.8; white-space: pre-wrap;">${description}</p>
+                <div style="line-height: 1.8;">${description}</div>
             `;
             
             modal.classList.add('show');
