@@ -1492,16 +1492,16 @@
             const tagsHtml = tags.map(tag => `<span class="tag" onclick="filterByTag('${tag}')">${tag}</span>`).join('');
             
             const description = formatText(memory.Description || memory.description || '');
-            const submitter = memory.Submitter || memory.submitter || 'Anonymous';
+            const submitter = memory.Submitter || memory.submitter || '';
             
             return `
                 <div class="memory-card" onclick="openMemoryModal('${memory.id}')">
                     ${mediaHtml}
                     <div class="memory-content">
                         <h3 class="memory-title">${title}</h3>
-                        <p class="memory-description">${description}</p>
+                        ${description ? `<p class="memory-description">${description}</p>` : ''}
                         <div class="memory-meta">
-                            <span>By: ${submitter}</span>
+                            ${submitter ? `<span>By: ${submitter}</span>` : ''}
                             <span>${date}</span>
                         </div>
                         ${tagsHtml ? `<div class="memory-tags">${tagsHtml}</div>` : ''}
