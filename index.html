@@ -1344,7 +1344,7 @@
                 title: formData.get('title'),
                 description: formData.get('description'),
                 youtube: formData.get('youtube'),
-                submitter: formData.get('submitter') || 'Anonymous',
+                submitter: formData.get('submitter') || '',
                 email: formData.get('email') || '',
                 tags: [],
                 cloudinaryUrl: null
@@ -1736,7 +1736,7 @@
         const tagsHtml = tags.map(tag => `<span class="tag">${tag}</span>`).join('');
         
         const description = formatText(memory.Description || memory.description || '');
-        const submitter = memory.Submitter || memory.submitter || 'Anonymous';
+        const submitter = memory.Submitter || memory.submitter || '';
         
         content.innerHTML = `
             ${mediaHtml}
