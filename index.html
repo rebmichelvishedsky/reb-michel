@@ -58,18 +58,14 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-grow: 1;
+            justify-content: center;
         }
 
         .logo h1 {
             font-size: 1.8rem;
             font-weight: 300;
             color: var(--text-color);
-        }
-
-        .hebrew-name {
-            font-size: 1.2rem;
-            color: var(--accent-color);
-            direction: rtl;
         }
 
         .bh-text {
@@ -102,7 +98,6 @@
         .admin-controls {
             display: flex;
             gap: 10px;
-            margin-left: auto;
         }
 
         .admin-controls.authenticated {
@@ -392,7 +387,6 @@
             gap: 10px;
         }
 
-
         .btn-small {
             padding: 6px 12px;
             font-size: 12px;
@@ -531,6 +525,10 @@
             .header-content {
                 flex-direction: column;
                 text-align: center;
+            }
+
+            .logo {
+                flex-grow: 0;
             }
 
             .nav-menu {
@@ -699,7 +697,7 @@
             <!-- Home Section -->
             <div id="home-section" class="section">
                 <div style="text-align: center; margin-bottom: 40px;">
-                    <h2 id="welcome-title">In loving memory of Reb Michel Vishedsky</h2>
+                    <h2 id="welcome-title">In loving memory of Reb Michel Vishedsky ע"ה</h2>
                     <p id="welcome-text" style="font-size: 1.1rem; color: var(--accent-color); margin-top: 20px;">
                         A place to share and preserve cherished memories, stories, and moments that celebrate his life and legacy.
                     </p>
@@ -806,11 +804,11 @@
             <!-- About Section -->
             <div id="about-section" class="section" style="display: none;">
                 <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h2 id="about-title">About Reb Michel Vishedsky</h2>
+                    <h2 id="about-title">About Reb Michel Vishedsky ע"ה</h2>
                     <div id="about-content">
-                        <p>This website is dedicated to preserving and sharing the precious memories of Reb Michel Vishedsky ע"ה.</p>
-                        <p>Here, family, friends, and all those whose lives he touched can share photos, videos, stories, and memories that celebrate his life, teachings, and the impact he had, and continues to have, on all of us.</p>
-                        <p>Every memory shared here contributes to keeping his legacy alive for future generations.</p>
+                        <p id="about-content-p1">This website is dedicated to preserving and sharing the precious memories of Reb Michel Vishedsky ע"ה.</p>
+                        <p id="about-content-p2">Here, family, friends, and all those whose lives he touched can share photos, videos, stories, and memories that celebrate his life, teachings, and the impact he had, and continues to have, on all of us.</p>
+                        <p id="about-content-p3">Every memory shared here contributes to keeping his legacy alive for future generations.</p>
                     </div>
                 </div>
             </div>
@@ -863,7 +861,7 @@
 
     <footer>
         <div class="container">
-            <p id="footer-text">In loving memory of Reb Michel Vishedsky - הרב מיכל וישצקי ע"ה</p>
+            <p id="footer-text">In loving memory of Reb Michel Vishedsky ע"ה</p>
             <p id="contact-text">Contact: rebmichelvishedsky@gmail.com</p>
         </div>
     </footer>
@@ -876,6 +874,8 @@
             apiKey: '', // Will be configured by admin
         };
 
+        const VIDEO_UPLOAD_URL = 'https://reb-michel-video.onrender.com/upload'; // Placeholder URL
+
         // Language system
         const translations = {
             en: {
@@ -886,7 +886,7 @@
                 'nav-share': 'Share Memory',
                 'nav-about': 'About',
                 'welcome-title': 'In loving memory of Reb Michel Vishedsky ע"ה',
-                'welcome-text': 'A place to share and preserve cherished memories, stories, and moments.',
+                'welcome-text': 'A place to share and preserve cherished memories, stories, and moments that celebrate his life and legacy.',
                 'memories-title': 'All Memories',
                 'share-title': 'Share a Memory',
                 'type-label': 'Type of Memory',
@@ -898,8 +898,11 @@
                 'name-label': 'Your Name (Optional)',
                 'email-label': 'Your Email (Optional)',
                 'submit-btn': 'Share Memory',
-                'about-title': 'About Reb Michel Vishedsky',
-                'footer-text': 'In loving memory of Reb Michel Vishedsky - הרב מיכל וישצקי ע"ה',
+                'about-title': 'About Reb Michel Vishedsky ע"ה',
+                'about-content-p1': 'This website is dedicated to preserving and sharing the precious memories of Reb Michel Vishedsky ע"ה.',
+                'about-content-p2': 'Here, family, friends, and all those whose lives he touched can share photos, videos, stories, and memories that celebrate his life, teachings, and the impact he had, and continues to have, on all of us.',
+                'about-content-p3': 'Every memory shared here contributes to keeping his legacy alive for future generations.',
+                'footer-text': 'In loving memory of Reb Michel Vishedsky ע"ה',
                 'contact-text': 'Contact: rebmichelvishedsky@gmail.com'
             },
             he: {
@@ -910,7 +913,7 @@
                 'nav-share': 'שתף זכרון',
                 'nav-about': 'אודות',
                 'welcome-title': 'לזכר הרב מיכל וישצקי ע"ה',
-                'welcome-text': 'מקום לשתף ולשמר זכרונות יקרים, סיפורים ורגעים.',
+                'welcome-text': 'מקום לשתף ולשמר זכרונות יקרים, סיפורים ורגעים שחוגגים את חייו ומורשתו.',
                 'memories-title': 'כל הזכרונות',
                 'share-title': 'שתף זכרון',
                 'type-label': 'סוג הזכרון',
@@ -922,7 +925,10 @@
                 'name-label': 'שמך (אופציונלי)',
                 'email-label': 'האימייל שלך (אופציונלי)',
                 'submit-btn': 'שתף זכרון',
-                'about-title': 'אודות הרב מיכל וישצקי',
+                'about-title': 'אודות הרב מיכל וישצקי ע"ה',
+                'about-content-p1': 'אתר הנצחה זה מוקדש לשימור ושיתוף הזיכרונות היקרים מהרב מיכל וישצקי ע"ה.',
+                'about-content-p2': 'כאן, משפחה, חברים, וכל אלה שחייהם הושפעו ממנו יכולים לחלוק תמונות, סרטונים, סיפורים וזיכרונות החוגגים את חייו, תורתו, והשפעתו על קהילתנו.',
+                'about-content-p3': 'כל זיכרון המשותף כאן תורם לשמירת מורשתו חיה לדורות הבאים.',
                 'footer-text': 'לזכר הרב מיכל וישצקי ע"ה',
                 'contact-text': 'יצירת קשר: rebmichelvishedsky@gmail.com'
             }
@@ -1248,7 +1254,7 @@
 
         // YouTube URL processing
         function getYouTubeEmbedId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|&v=)([^#&?]*).*/;
             const match = url.match(regExp);
             return (match && match[2].length === 11) ? match[2] : null;
         }
@@ -1306,9 +1312,50 @@
                     fileData: null
                 };
 
-                // Handle file upload - store as base64 in description for now
                 const fileInput = document.getElementById('memory-file');
-                if (memoryData.type === 'voice' && recordedBlob) {
+
+                if (memoryData.type === 'video' && fileInput.files[0]) {
+                    const videoFile = fileInput.files[0];
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('video', videoFile);
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', VIDEO_UPLOAD_URL, true);
+
+                    xhr.upload.onprogress = function(e) {
+                        if (e.lengthComputable) {
+                            const percentComplete = (e.loaded / e.total) * 100;
+                            showAlert(`Uploading video: ${percentComplete.toFixed(2)}%`, 'info');
+                        }
+                    };
+
+                    xhr.onload = async function() {
+                        if (xhr.status === 200) {
+                            const response = JSON.parse(xhr.responseText);
+                            memoryData.youtube = response.embedUrl;
+                            
+                            const newMemory = await saveMemoryToAirtable(memoryData);
+                            memories.unshift(newMemory);
+                            
+                            showAlert('Video uploaded and memory shared successfully!', 'success');
+                            resetForm();
+                            refreshCurrentView();
+                        } else {
+                            showAlert(`Video upload failed: ${xhr.responseText}`, 'error');
+                        }
+                        submitBtn.textContent = 'Share Memory';
+                        submitBtn.disabled = false;
+                    };
+
+                    xhr.onerror = function() {
+                        showAlert('An error occurred during the video upload. Please try again.', 'error');
+                        submitBtn.textContent = 'Share Memory';
+                        submitBtn.disabled = false;
+                    };
+
+                    xhr.send(uploadFormData);
+
+                } else if (memoryData.type === 'voice' && recordedBlob) {
                     const reader = new FileReader();
                     reader.onload = async function(e) {
                         memoryData.description += `\n\n[Voice Note: ${Math.floor(recordingSeconds/60)}:${(recordingSeconds%60).toString().padStart(2,'0')} duration - Contact admin to add audio file]`;
@@ -1356,8 +1403,10 @@
                 console.error('Error submitting memory:', error);
                 showAlert('Failed to submit memory. Please try again.', 'error');
             } finally {
-                submitBtn.textContent = 'Share Memory';
-                submitBtn.disabled = false;
+                if (memoryData.type !== 'video') {
+                    submitBtn.textContent = 'Share Memory';
+                    submitBtn.disabled = false;
+                }
             }
         });
 
@@ -1870,9 +1919,6 @@
 
                     // Update UI
                     startBtn.disabled = false;
-                    pauseBtn.disabled = true;
-                    stopBtn.disabled = true;
-                    playBtn.disabled = false;
                     pauseBtn.disabled = true;
                     stopBtn.disabled = true;
                     playBtn.disabled = false;
