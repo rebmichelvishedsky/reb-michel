@@ -583,6 +583,7 @@
             border: 1px solid #f5c6cb;
         }
     </style>
+    <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
 </head>
 <body>
     <header>
@@ -866,1120 +867,1206 @@
     </footer>
 
     <script>
-        // Airtable Configuration
-        const AIRTABLE_CONFIG = {
-            baseId: '', // Will be configured by admin
-            tableName: 'Memories',
-            apiKey: '', // Will be configured by admin
-        };
+    // ============================================
+    // CLOUDINARY CONFIGURATION
+    // ============================================
+    const CLOUDINARY_CONFIG = {
+        cloudName: 'deiauee2m', 
+        uploadPreset: 'memorial_uploads', // Must match the preset you created
+    };
 
-        const VIDEO_UPLOAD_URL = 'https://reb-michel-video.onrender.com/upload'; // Placeholder URL
+    // ============================================
+    // AIRTABLE CONFIGURATION
+    // ============================================
+    const AIRTABLE_CONFIG = {
+        baseId: '',
+        tableName: 'Memories',
+        apiKey: '',
+    };
 
-        // Language system
-        const translations = {
-            en: {
-                'main-title': 'In Memory of Reb Michel Vishedsky ע"ה',
-                'admin-btn': 'Admin',
-                'nav-home': 'Home',
-                'nav-memories': 'Memories',
-                'nav-share': 'Share Memory',
-                'nav-about': 'About',
-                'welcome-title': 'In loving memory of Reb Michel Vishedsky ע"ה',
-                'welcome-text': 'A place to share and preserve cherished memories, stories, and moments that celebrate his life and legacy.',
-                'memories-title': 'All Memories',
-                'share-title': 'Share a Memory',
-                'type-label': 'Type of Memory',
-                'title-label': 'Title',
-                'description-label': 'Description or Story',
-                'file-label': 'Upload File',
-                'file-text': 'Click to select or drag file here',
-                'youtube-label': 'YouTube URL',
-                'name-label': 'Your Name (Optional)',
-                'email-label': 'Your Email (Optional)',
-                'submit-btn': 'Share Memory',
-                'about-title': 'About Reb Michel Vishedsky ע"ה',
-                'about-content-p1': 'This website is dedicated to preserving and sharing the precious memories of Reb Michel Vishedsky ע"ה.',
-                'about-content-p2': 'Here, family, friends, and all those whose lives he touched can share photos, videos, stories, and memories that celebrate his life, teachings, and the impact he had, and continues to have, on all of us.',
-                'about-content-p3': 'Every memory shared here contributes to keeping his legacy alive for future generations.',
-                'footer-text': 'In loving memory of Reb Michel Vishedsky ע"ה',
-                'contact-text': 'Contact: rebmichelvishedsky@gmail.com'
-            },
-            he: {
-                'main-title': 'לזכר הרב מיכל וישצקי ע"ה',
-                'admin-btn': 'מנהל',
-                'nav-home': 'בית',
-                'nav-memories': 'זכרונות',
-                'nav-share': 'שתף זכרון',
-                'nav-about': 'אודות',
-                'welcome-title': 'לזכר הרב מיכל וישצקי ע"ה',
-                'welcome-text': 'מקום לשתף ולשמר זכרונות יקרים, סיפורים ורגעים שחוגגים את חייו ומורשתו.',
-                'memories-title': 'כל הזכרונות',
-                'share-title': 'שתף זכרון',
-                'type-label': 'סוג הזכרון',
-                'title-label': 'כותרת',
-                'description-label': 'תיאור או סיפור',
-                'file-label': 'העלה קובץ',
-                'file-text': 'לחץ לבחירה או גרור קובץ כאן',
-                'youtube-label': 'קישור יוטיוב',
-                'name-label': 'שמך (אופציונלי)',
-                'email-label': 'האימייל שלך (אופציונלי)',
-                'submit-btn': 'שתף זכרון',
-                'about-title': 'אודות הרב מיכל וישצקי ע"ה',
-                'about-content-p1': 'אתר הנצחה זה מוקדש לשימור ושיתוף הזיכרונות היקרים מהרב מיכל וישצקי ע"ה.',
-                'about-content-p2': 'כאן, משפחה, חברים, וכל אלה שחייהם הושפעו ממנו יכולים לחלוק תמונות, סרטונים, סיפורים וזיכרונות החוגגים את חייו, תורתו, והשפעתו על קהילתנו.',
-                'about-content-p3': 'כל זיכרון המשותף כאן תורם לשמירת מורשתו חיה לדורות הבאים.',
-                'footer-text': 'לזכר הרב מיכל וישצקי ע"ה',
-                'contact-text': 'יצירת קשר: rebmichelvishedsky@gmail.com'
-            }
-        };
+    const VIDEO_UPLOAD_URL = 'https://reb-michel-video.onrender.com/upload';
 
-        let currentLanguage = 'en';
-        let memories = [];
-        let isAdmin = false;
-        let availableTags = [];
-        let currentEditingMemory = null;
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let recordedBlob = null;
-        let recordingTimer = null;
-        let recordingSeconds = 0;
-        let isPaused = false;
+    // Language system (keeping your existing translations)
+    const translations = {
+        en: {
+            'main-title': 'In Memory of Reb Michel Vishedsky ע"ה',
+            'admin-btn': 'Admin',
+            'nav-home': 'Home',
+            'nav-memories': 'Memories',
+            'nav-share': 'Share Memory',
+            'nav-about': 'About',
+            'welcome-title': 'In loving memory of Reb Michel Vishedsky ע"ה',
+            'welcome-text': 'A place to share and preserve cherished memories, stories, and moments that celebrate his life and legacy.',
+            'memories-title': 'All Memories',
+            'share-title': 'Share a Memory',
+            'type-label': 'Type of Memory',
+            'title-label': 'Title',
+            'description-label': 'Description or Story',
+            'file-label': 'Upload File',
+            'file-text': 'Click to select or drag file here',
+            'youtube-label': 'YouTube URL',
+            'name-label': 'Your Name (Optional)',
+            'email-label': 'Your Email (Optional)',
+            'submit-btn': 'Share Memory',
+            'about-title': 'About Reb Michel Vishedsky ע"ה',
+            'about-content-p1': 'This website is dedicated to preserving and sharing the precious memories of Reb Michel Vishedsky ע"ה.',
+            'about-content-p2': 'Here, family, friends, and all those whose lives he touched can share photos, videos, stories, and memories that celebrate his life, teachings, and the impact he had, and continues to have, on all of us.',
+            'about-content-p3': 'Every memory shared here contributes to keeping his legacy alive for future generations.',
+            'footer-text': 'In loving memory of Reb Michel Vishedsky ע"ה',
+            'contact-text': 'Contact: rebmichelvishedsky@gmail.com'
+        },
+        he: {
+            'main-title': 'לזכר הרב מיכל וישצקי ע"ה',
+            'admin-btn': 'מנהל',
+            'nav-home': 'בית',
+            'nav-memories': 'זכרונות',
+            'nav-share': 'שתף זכרון',
+            'nav-about': 'אודות',
+            'welcome-title': 'לזכר הרב מיכל וישצקי ע"ה',
+            'welcome-text': 'מקום לשתף ולשמר זכרונות יקרים, סיפורים ורגעים שחוגגים את חייו ומורשתו.',
+            'memories-title': 'כל הזכרונות',
+            'share-title': 'שתף זכרון',
+            'type-label': 'סוג הזכרון',
+            'title-label': 'כותרת',
+            'description-label': 'תיאור או סיפור',
+            'file-label': 'העלה קובץ',
+            'file-text': 'לחץ לבחירה או גרור קובץ כאן',
+            'youtube-label': 'קישור יוטיוב',
+            'name-label': 'שמך (אופציונלי)',
+            'email-label': 'האימייל שלך (אופציונלי)',
+            'submit-btn': 'שתף זכרון',
+            'about-title': 'אודות הרב מיכל וישצקי ע"ה',
+            'about-content-p1': 'אתר הנצחה זה מוקדש לשימור ושיתוף הזיכרונות היקרים מהרב מיכל וישצקי ע"ה.',
+            'about-content-p2': 'כאן, משפחה, חברים, וכל אלה שחייהם הושפעו ממנו יכולים לחלוק תמונות, סרטונים, סיפורים וזיכרונות החוגגים את חייו, תורתו, והשפעתו על קהילתנו.',
+            'about-content-p3': 'כל זיכרון המשותף כאן תורם לשמירת מורשתו חיה לדורות הבאים.',
+            'footer-text': 'לזכר הרב מיכל וישצקי ע"ה',
+            'contact-text': 'יצירת קשר: rebmichelvishedsky@gmail.com'
+        }
+    };
 
-        // Initialize Airtable configuration
-        function initializeAirtableConfig() {
-            // Load configuration from localStorage
-            const savedBaseId = localStorage.getItem('airtable_base_id');
-            const savedApiKey = localStorage.getItem('airtable_api_key');
+    let currentLanguage = 'en';
+    let memories = [];
+    let isAdmin = false;
+    let availableTags = [];
+    let currentEditingMemory = null;
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let recordedBlob = null;
+    let recordingTimer = null;
+    let recordingSeconds = 0;
+    let isPaused = false;
+
+    // ============================================
+    // CLOUDINARY UPLOAD FUNCTION
+    // ============================================
+    async function uploadToCloudinary(file, resourceType = 'auto') {
+        return new Promise((resolve, reject) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+            formData.append('folder', 'memorial_site');
             
-            if (savedBaseId) {
-                AIRTABLE_CONFIG.baseId = savedBaseId;
+            // Determine the upload endpoint based on resource type
+            const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/${resourceType}/upload`;
+            
+            fetch(uploadUrl, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.secure_url) {
+                    resolve({
+                        url: data.secure_url,
+                        publicId: data.public_id,
+                        format: data.format,
+                        resourceType: data.resource_type
+                    });
+                } else {
+                    reject(new Error('Upload failed'));
+                }
+            })
+            .catch(error => reject(error));
+        });
+    }
+
+    // ============================================
+    // INITIALIZE FUNCTIONS
+    // ============================================
+    function initializeAirtableConfig() {
+        const savedBaseId = localStorage.getItem('airtable_base_id');
+        const savedApiKey = localStorage.getItem('airtable_api_key');
+        
+        if (savedBaseId) {
+            AIRTABLE_CONFIG.baseId = savedBaseId;
+            if (document.getElementById('base-id-input')) {
                 document.getElementById('base-id-input').value = savedBaseId;
             }
-            
-            if (savedApiKey) {
-                AIRTABLE_CONFIG.apiKey = savedApiKey;
+        }
+        
+        if (savedApiKey) {
+            AIRTABLE_CONFIG.apiKey = savedApiKey;
+            if (document.getElementById('api-key-input')) {
                 document.getElementById('api-key-input').value = savedApiKey;
             }
         }
+    }
 
-        // Save Airtable configuration
-        function saveAirtableConfig() {
-            const baseId = document.getElementById('base-id-input').value.trim();
-            const apiKey = document.getElementById('api-key-input').value.trim();
-            
-            if (!baseId || !apiKey) {
-                showConfigStatus('Please enter both Base ID and API Key', 'error');
-                return;
-            }
-
-            if (!baseId.startsWith('app')) {
-                showConfigStatus('Base ID should start with "app"', 'error');
-                return;
-            }
-
-            if (!apiKey.startsWith('pat')) {
-                showConfigStatus('API Key should start with "pat"', 'error');
-                return;
-            }
-
-            // Save to localStorage
-            localStorage.setItem('airtable_base_id', baseId);
-            localStorage.setItem('airtable_api_key', apiKey);
-            
-            // Update configuration
-            AIRTABLE_CONFIG.baseId = baseId;
-            AIRTABLE_CONFIG.apiKey = apiKey;
-            
-            showConfigStatus('Database configuration saved successfully!', 'success');
-            testAirtableConnection();
+    function saveAirtableConfig() {
+        const baseId = document.getElementById('base-id-input').value.trim();
+        const apiKey = document.getElementById('api-key-input').value.trim();
+        
+        if (!baseId || !apiKey) {
+            showConfigStatus('Please enter both Base ID and API Key', 'error');
+            return;
         }
 
-        // Test Airtable connection
-        async function testAirtableConnection() {
-            if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
-                showConfigStatus('Please save configuration first', 'error');
-                return;
-            }
+        if (!baseId.startsWith('app')) {
+            showConfigStatus('Base ID should start with "app"', 'error');
+            return;
+        }
 
-            try {
-                const response = await fetch(
-                    `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}?maxRecords=1`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                );
+        if (!apiKey.startsWith('pat')) {
+            showConfigStatus('API Key should start with "pat"', 'error');
+            return;
+        }
 
-                if (response.ok) {
-                    showConfigStatus('✅ Database connection successful!', 'success');
-                    // Refresh memories from database
-                    await fetchMemoriesFromAirtable();
-                    refreshCurrentView();
-                } else {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        localStorage.setItem('airtable_base_id', baseId);
+        localStorage.setItem('airtable_api_key', apiKey);
+        
+        AIRTABLE_CONFIG.baseId = baseId;
+        AIRTABLE_CONFIG.apiKey = apiKey;
+        
+        showConfigStatus('Database configuration saved successfully!', 'success');
+        testAirtableConnection();
+    }
+
+    async function testAirtableConnection() {
+        if (!AIRTABLE_CONFIG.apiKey || !AIRTABLE_CONFIG.baseId) {
+            showConfigStatus('Please save configuration first', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}?maxRecords=1`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
+                        'Content-Type': 'application/json',
+                    },
                 }
-            } catch (error) {
-                showConfigStatus(`❌ Connection failed: ${error.message}`, 'error');
-            }
-        }
+            );
 
-        // Show configuration status
-        function showConfigStatus(message, type) {
-            const statusDiv = document.getElementById('config-status');
+            if (response.ok) {
+                showConfigStatus('✅ Database connection successful!', 'success');
+                await fetchMemoriesFromAirtable();
+                refreshCurrentView();
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        } catch (error) {
+            showConfigStatus(`❌ Connection failed: ${error.message}`, 'error');
+        }
+    }
+
+    function showConfigStatus(message, type) {
+        const statusDiv = document.getElementById('config-status');
+        if (statusDiv) {
             statusDiv.innerHTML = `<div class="alert alert-${type}" style="margin-top: 10px;">${message}</div>`;
             
             setTimeout(() => {
                 statusDiv.innerHTML = '';
             }, 5000);
         }
+    }
 
-        async function initializeAirtable() {
-            // Try to fetch from Vercel function that returns environment variables
-            try {
-                const response = await fetch('/api/get-config');
-                if (response.ok) {
-                    const config = await response.json();
-                    AIRTABLE_CONFIG.apiKey = config.AIRTABLE_API_KEY;
-                    AIRTABLE_CONFIG.baseId = config.AIRTABLE_BASE_ID;
-                } else {
-                    // Fallback to localStorage if the API fails
-                    initializeAirtableConfig();
-                }
-            } catch (error) {
-                console.warn('Could not load configuration from environment. Falling back to localStorage.');
+    async function initializeAirtable() {
+        try {
+            const response = await fetch('/api/get-config');
+            if (response.ok) {
+                const config = await response.json();
+                AIRTABLE_CONFIG.apiKey = config.AIRTABLE_API_KEY;
+                AIRTABLE_CONFIG.baseId = config.AIRTABLE_BASE_ID;
+            } else {
                 initializeAirtableConfig();
             }
+        } catch (error) {
+            console.warn('Could not load configuration from environment. Falling back to localStorage.');
+            initializeAirtableConfig();
         }
+    }
 
-        // Airtable API functions
-        async function fetchMemoriesFromAirtable() {
-            showLoading(true);
-            try {
-                const response = await fetch(
-                    `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}?sort[0][field]=Created&sort[0][direction]=desc`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
-                            'Content-Type': 'application/json',
-                        },
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`Airtable API error: ${response.status}`);
+    // ============================================
+    // AIRTABLE API FUNCTIONS
+    // ============================================
+    async function fetchMemoriesFromAirtable() {
+        showLoading(true);
+        try {
+            const response = await fetch(
+                `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}?sort[0][field]=Created&sort[0][direction]=desc`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
+                        'Content-Type': 'application/json',
+                    },
                 }
+            );
 
-                const data = await response.json();
-                memories = data.records.map(record => ({
-                    id: record.id,
-                    ...record.fields,
-                    timestamp: record.fields.Created || new Date().toISOString(),
-                    tags: record.fields.Tags ? record.fields.Tags.split(',').map(tag => tag.trim()) : []
-                }));
-
-                showLoading(false);
-                return memories;
-            } catch (error) {
-                console.error('Error fetching memories:', error);
-                showLoading(false);
-                showAlert('Failed to load memories. Please check your internet connection.', 'error');
-                return [];
+            if (!response.ok) {
+                throw new Error(`Airtable API error: ${response.status}`);
             }
+
+            const data = await response.json();
+            memories = data.records.map(record => ({
+                id: record.id,
+                ...record.fields,
+                timestamp: record.fields.Created || new Date().toISOString(),
+                tags: record.fields.Tags ? record.fields.Tags.split(',').map(tag => tag.trim()) : []
+            }));
+
+            showLoading(false);
+            return memories;
+        } catch (error) {
+            console.error('Error fetching memories:', error);
+            showLoading(false);
+            showAlert('Failed to load memories. Please check your internet connection.', 'error');
+            return [];
         }
+    }
 
-        async function saveMemoryToAirtable(memoryData) {
-            try {
-                console.log('Sending to Airtable:', memoryData); // Debug log
-                
-                const payload = {
-                    fields: {}
-                };
-
-                // Only send fields that have values
-                if (memoryData.title) payload.fields.Title = memoryData.title;
-                if (memoryData.description) payload.fields.Description = memoryData.description;
-                if (memoryData.type) payload.fields.Type = memoryData.type;
-                if (memoryData.submitter) payload.fields.Submitter = memoryData.submitter;
-                if (memoryData.email) payload.fields.Email = memoryData.email;
-                if (memoryData.youtube) payload.fields.YouTube = memoryData.youtube;
-                if (memoryData.tags && memoryData.tags.length > 0) {
-                    payload.fields.Tags = memoryData.tags.join(', ');
-                }
-                
-                if (memoryData.fileData) {
-                    payload.fields.FileData = memoryData.fileData.data;
-                    payload.fields.FileName = memoryData.fileData.name;
-                    payload.fields.FileType = memoryData.fileData.type;
-                }
-
-                console.log('Payload being sent:', JSON.stringify(payload, null, 2)); // Debug log
-
-                const response = await fetch(
-                    `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}`,
-                    {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(payload),
-                    }
-                );
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    console.error('Airtable API Error Details:', errorData);
-                    throw new Error(`Airtable error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
-                }
-
-                const newRecord = await response.json();
-                console.log('Airtable response:', newRecord); // Debug log
-                
-                return {
-                    id: newRecord.id,
-                    ...newRecord.fields,
-                    timestamp: newRecord.createdTime,
-                    tags: newRecord.fields.Tags ? newRecord.fields.Tags.split(',').map(tag => tag.trim()) : []
-                };
-            } catch (error) {
-                console.error('Detailed error in saveMemoryToAirtable:', error);
-                throw error;
-            }
-        }
-
-        async function updateMemoryInAirtable(memoryId, updateData) {
-            try {
-                const response = await fetch(
-                    `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}/${memoryId}`,
-                    {
-                        method: 'PATCH',
-                        headers: {
-                            'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            fields: {
-                                Title: updateData.title,
-                                Description: updateData.description,
-                                Tags: updateData.tags ? updateData.tags.join(', ') : ''
-                            }
-                        }),
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`Failed to update memory: ${response.status}`);
-                }
-
-                return await response.json();
-            } catch (error) {
-                console.error('Error updating memory:', error);
-                throw error;
-            }
-        }
-
-        async function deleteMemoryFromAirtable(memoryId) {
-            try {
-                const response = await fetch(
-                    `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}/${memoryId}`,
-                    {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
-                        },
-                    }
-                );
-
-                if (!response.ok) {
-                    throw new Error(`Failed to delete memory: ${response.status}`);
-                }
-
-                return true;
-            } catch (error) {
-                console.error('Error deleting memory:', error);
-                throw error;
-            }
-        }
-
-        // Loading indicator
-        function showLoading(show) {
-            document.getElementById('loading').style.display = show ? 'block' : 'none';
-        }
-
-        // Language switching
-        function setLanguage(lang) {
-            currentLanguage = lang;
-            document.body.className = lang === 'he' ? 'hebrew' : '';
-            document.body.dir = lang === 'he' ? 'rtl' : 'ltr';
+    async function saveMemoryToAirtable(memoryData) {
+        try {
+            console.log('Sending to Airtable:', memoryData);
             
-            // Update all translatable elements
-            Object.keys(translations[lang]).forEach(key => {
-                const element = document.getElementById(key);
-                if (element) {
-                    if (element.tagName === 'INPUT' && element.type === 'text') {
-                        element.placeholder = translations[lang][key];
-                    } else {
-                        element.textContent = translations[lang][key];
-                    }
+            const payload = {
+                fields: {}
+            };
+
+            if (memoryData.title) payload.fields.Title = memoryData.title;
+            if (memoryData.description) payload.fields.Description = memoryData.description;
+            if (memoryData.type) payload.fields.Type = memoryData.type;
+            if (memoryData.submitter) payload.fields.Submitter = memoryData.submitter;
+            if (memoryData.email) payload.fields.Email = memoryData.email;
+            if (memoryData.youtube) payload.fields.YouTube = memoryData.youtube;
+            if (memoryData.cloudinaryUrl) payload.fields.CloudinaryURL = memoryData.cloudinaryUrl;
+            if (memoryData.tags && memoryData.tags.length > 0) {
+                payload.fields.Tags = memoryData.tags.join(', ');
+            }
+
+            console.log('Payload being sent:', JSON.stringify(payload, null, 2));
+
+            const response = await fetch(
+                `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
                 }
-            });
+            );
 
-            // Update active language button
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-
-        // Section navigation
-        function showSection(section) {
-            // Hide all sections
-            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-            
-            // Show selected section
-            document.getElementById(section + '-section').style.display = 'block';
-            
-            // Update nav
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById('nav-' + section).classList.add('active');
-
-            // Load content based on section
-            if (section === 'memories') {
-                loadAllMemories();
-            } else if (section === 'home') {
-                loadRecentMemories();
-            }
-        }
-
-        // YouTube URL processing
-        function getYouTubeEmbedId(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|&v=)([^#&?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
-        // Memory type handler
-        document.getElementById('memory-type').addEventListener('change', function() {
-            const fileGroup = document.getElementById('file-group');
-            const youtubeGroup = document.getElementById('youtube-group');
-            const voiceGroup = document.getElementById('voice-group');
-
-            // Hide all input types first
-            fileGroup.style.display = 'none';
-            youtubeGroup.style.display = 'none';
-            voiceGroup.style.display = 'none';
-            
-            if (this.value === 'youtube') {
-                fileGroup.style.display = 'none';
-                youtubeGroup.style.display = 'block';
-            } else if (this.value === 'voice') {
-                voiceGroup.style.display = 'block';
-            } else {
-                fileGroup.style.display = 'block';
-            }
-        });
-
-        // File upload handler
-        document.getElementById('memory-file').addEventListener('change', function() {
-            const fileName = this.files[0] ? this.files[0].name : 'Click to select or drag file here';
-            document.getElementById('file-text').textContent = fileName;
-        });
-
-        // Form submission with Airtable integration
-        document.getElementById('memory-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (!AIRTABLE_CONFIG.apiKey) {
-                showAlert('Database not configured. Please contact the administrator.', 'error');
-                return;
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Airtable API Error Details:', errorData);
+                throw new Error(`Airtable error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
             }
 
-            const submitBtn = document.getElementById('submit-btn');
-            submitBtn.textContent = 'Submitting...';
-            submitBtn.disabled = true;
+            const newRecord = await response.json();
+            console.log('Airtable response:', newRecord);
+            
+            return {
+                id: newRecord.id,
+                ...newRecord.fields,
+                timestamp: newRecord.createdTime,
+                tags: newRecord.fields.Tags ? newRecord.fields.Tags.split(',').map(tag => tag.trim()) : []
+            };
+        } catch (error) {
+            console.error('Detailed error in saveMemoryToAirtable:', error);
+            throw error;
+        }
+    }
 
-            try {
-                const formData = new FormData(this);
-                const memoryData = {
-                    type: formData.get('type'),
-                    title: formData.get('title'),
-                    description: formData.get('description'),
-                    youtube: formData.get('youtube'),
-                    submitter: formData.get('submitter') || 'Anonymous',
-                    email: formData.get('email') || '',
-                    tags: [],
-                    fileData: null
-                };
-
-                const fileInput = document.getElementById('memory-file');
-
-                if (memoryData.type === 'video' && fileInput.files[0]) {
-                    const videoFile = fileInput.files[0];
-                    const uploadFormData = new FormData();
-                    uploadFormData.append('video', videoFile);
-
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', VIDEO_UPLOAD_URL, true);
-
-                    xhr.upload.onprogress = function(e) {
-                        if (e.lengthComputable) {
-                            const percentComplete = (e.loaded / e.total) * 100;
-                            showAlert(`Uploading video: ${percentComplete.toFixed(2)}%`, 'info');
+    async function updateMemoryInAirtable(memoryId, updateData) {
+        try {
+            const response = await fetch(
+                `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}/${memoryId}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fields: {
+                            Title: updateData.title,
+                            Description: updateData.description,
+                            Tags: updateData.tags ? updateData.tags.join(', ') : ''
                         }
-                    };
+                    }),
+                }
+            );
 
-                    xhr.onload = async function() {
-                        if (xhr.status === 200) {
-                            const response = JSON.parse(xhr.responseText);
-                            memoryData.youtube = response.embedUrl;
-                            
-                            const newMemory = await saveMemoryToAirtable(memoryData);
-                            memories.unshift(newMemory);
-                            
-                            showAlert('Video uploaded and memory shared successfully!', 'success');
-                            resetForm();
-                            refreshCurrentView();
-                        } else {
-                            showAlert(`Video upload failed: ${xhr.responseText}`, 'error');
-                        }
-                        submitBtn.textContent = 'Share Memory';
-                        submitBtn.disabled = false;
-                    };
+            if (!response.ok) {
+                throw new Error(`Failed to update memory: ${response.status}`);
+            }
 
-                    xhr.onerror = function() {
-                        showAlert('An error occurred during the video upload. Please try again.', 'error');
-                        submitBtn.textContent = 'Share Memory';
-                        submitBtn.disabled = false;
-                    };
+            return await response.json();
+        } catch (error) {
+            console.error('Error updating memory:', error);
+            throw error;
+        }
+    }
 
-                    xhr.send(uploadFormData);
+    async function deleteMemoryFromAirtable(memoryId) {
+        try {
+            const response = await fetch(
+                `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}/${memoryId}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
+                    },
+                }
+            );
 
-                } else if (memoryData.type === 'voice' && recordedBlob) {
-                    const reader = new FileReader();
-                    reader.onload = async function(e) {
-                        memoryData.description += `\n\n[Voice Note: ${Math.floor(recordingSeconds/60)}:${(recordingSeconds%60).toString().padStart(2,'0')} duration - Contact admin to add audio file]`;
+            if (!response.ok) {
+                throw new Error(`Failed to delete memory: ${response.status}`);
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Error deleting memory:', error);
+            throw error;
+        }
+    }
+
+    // ============================================
+    // UI FUNCTIONS
+    // ============================================
+    function showLoading(show) {
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) {
+            loadingEl.style.display = show ? 'block' : 'none';
+        }
+    }
+
+    function setLanguage(lang) {
+        currentLanguage = lang;
+        document.body.className = lang === 'he' ? 'hebrew' : '';
+        document.body.dir = lang === 'he' ? 'rtl' : 'ltr';
         
-                        const newMemory = await saveMemoryToAirtable(memoryData);
-                        memories.unshift(newMemory);
-        
-                        showAlert('Voice note shared successfully! Audio noted - admin can add to Airtable manually.', 'success');
-                        resetForm();
-                        refreshCurrentView();
-                    };
-                    reader.readAsDataURL(recordedBlob);
-                } else if (fileInput.files[0] && memoryData.type !== 'youtube' && memoryData.type !== 'voice') {
-                    const reader = new FileReader();
-                    reader.onload = async function(e) {
-                        // For non-YouTube files, store the actual file data
-                        const fileName = fileInput.files[0].name;
-                        const fileType = fileInput.files[0].type;
-
-                        memoryData.fileData = {
-                            name: fileName,
-                            type: fileType,
-                            data: e.target.result
-                        };
-                        
-                        // Save to Airtable
-                        const newMemory = await saveMemoryToAirtable(memoryData);
-                        memories.unshift(newMemory);
-                        
-                        showAlert('Memory shared successfully! File noted - admin can add attachment to Airtable manually.', 'success');
-                        resetForm();
-                        refreshCurrentView();
-                    };
-                    reader.readAsDataURL(fileInput.files[0]);
+        Object.keys(translations[lang]).forEach(key => {
+            const element = document.getElementById(key);
+            if (element) {
+                if (element.tagName === 'INPUT' && element.type === 'text') {
+                    element.placeholder = translations[lang][key];
                 } else {
-                    // No file or YouTube link
+                    element.textContent = translations[lang][key];
+                }
+            }
+        });
+
+        document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function showSection(section) {
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        document.getElementById(section + '-section').style.display = 'block';
+        
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const navEl = document.getElementById('nav-' + section);
+        if (navEl) navEl.classList.add('active');
+
+        if (section === 'memories') {
+            loadAllMemories();
+        } else if (section === 'home') {
+            loadRecentMemories();
+        }
+    }
+
+    function getYouTubeEmbedId(url) {
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    // ============================================
+    // FORM HANDLING
+    // ============================================
+    document.getElementById('memory-type').addEventListener('change', function() {
+        const fileGroup = document.getElementById('file-group');
+        const youtubeGroup = document.getElementById('youtube-group');
+        const voiceGroup = document.getElementById('voice-group');
+
+        fileGroup.style.display = 'none';
+        youtubeGroup.style.display = 'none';
+        voiceGroup.style.display = 'none';
+        
+        if (this.value === 'youtube') {
+            fileGroup.style.display = 'none';
+            youtubeGroup.style.display = 'block';
+        } else if (this.value === 'voice') {
+            voiceGroup.style.display = 'block';
+        } else {
+            fileGroup.style.display = 'block';
+        }
+    });
+
+    document.getElementById('memory-file').addEventListener('change', function() {
+        const fileName = this.files[0] ? this.files[0].name : 'Click to select or drag file here';
+        document.getElementById('file-text').textContent = fileName;
+    });
+
+    // ============================================
+    // FORM SUBMISSION WITH CLOUDINARY
+    // ============================================
+    document.getElementById('memory-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!AIRTABLE_CONFIG.apiKey) {
+            showAlert('Database not configured. Please contact the administrator.', 'error');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submit-btn');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.textContent = 'Uploading...';
+        submitBtn.disabled = true;
+
+        try {
+            const formData = new FormData(this);
+            const memoryData = {
+                type: formData.get('type'),
+                title: formData.get('title'),
+                description: formData.get('description'),
+                youtube: formData.get('youtube'),
+                submitter: formData.get('submitter') || 'Anonymous',
+                email: formData.get('email') || '',
+                tags: [],
+                cloudinaryUrl: null
+            };
+
+            const fileInput = document.getElementById('memory-file');
+
+            // Handle YouTube
+            if (memoryData.type === 'youtube' && memoryData.youtube) {
+                const newMemory = await saveMemoryToAirtable(memoryData);
+                memories.unshift(newMemory);
+                showAlert('Memory shared successfully!', 'success');
+                resetForm();
+                refreshCurrentView();
+                
+            // Handle Voice Recording
+            } else if (memoryData.type === 'voice' && recordedBlob) {
+                submitBtn.textContent = 'Uploading audio...';
+                
+                try {
+                    const audioFile = new File([recordedBlob], `voice_${Date.now()}.wav`, { type: 'audio/wav' });
+                    const uploadResult = await uploadToCloudinary(audioFile, 'video'); // Cloudinary uses 'video' for audio
+                    
+                    memoryData.cloudinaryUrl = uploadResult.url;
+                    memoryData.description += `\n\n[Voice Note: ${Math.floor(recordingSeconds/60)}:${(recordingSeconds%60).toString().padStart(2,'0')} duration]`;
+                    
                     const newMemory = await saveMemoryToAirtable(memoryData);
                     memories.unshift(newMemory);
                     
-                    showAlert('Memory shared successfully! It is now live on the website.', 'success');
+                    showAlert('Voice note uploaded and shared successfully!', 'success');
                     resetForm();
                     refreshCurrentView();
+                } catch (error) {
+                    throw new Error('Failed to upload audio: ' + error.message);
                 }
-            } catch (error) {
-                console.error('Error submitting memory:', error);
-                showAlert('Failed to submit memory. Please try again.', 'error');
-            } finally {
-                if (memoryData.type !== 'video') {
-                    submitBtn.textContent = 'Share Memory';
-                    submitBtn.disabled = false;
+                
+            // Handle File Uploads (Images, Videos, Documents)
+            } else if (fileInput.files[0] && memoryData.type !== 'youtube') {
+                const file = fileInput.files[0];
+                submitBtn.textContent = 'Uploading file...';
+                
+                try {
+                    // Determine resource type
+                    let resourceType = 'auto';
+                    if (file.type.startsWith('image/')) {
+                        resourceType = 'image';
+                    } else if (file.type.startsWith('video/')) {
+                        resourceType = 'video';
+                    } else if (file.type.startsWith('audio/')) {
+                        resourceType = 'video'; // Cloudinary uses 'video' for audio
+                    }
+                    
+                    const uploadResult = await uploadToCloudinary(file, resourceType);
+                    memoryData.cloudinaryUrl = uploadResult.url;
+                    
+                    const newMemory = await saveMemoryToAirtable(memoryData);
+                    memories.unshift(newMemory);
+                    
+                    showAlert('File uploaded and memory shared successfully!', 'success');
+                    resetForm();
+                    refreshCurrentView();
+                } catch (error) {
+                    throw new Error('Failed to upload file: ' + error.message);
                 }
+                
+            // Handle Story-only submissions
+            } else {
+                const newMemory = await saveMemoryToAirtable(memoryData);
+                memories.unshift(newMemory);
+                
+                showAlert('Memory shared successfully!', 'success');
+                resetForm();
+                refreshCurrentView();
             }
-        });
-
-        // Reset form function
-        function resetForm() {
-            document.getElementById('memory-form').reset();
-            document.getElementById('file-text').textContent = 'Click to select or drag file here';
-            document.getElementById('file-group').style.display = 'block';
-            document.getElementById('youtube-group').style.display = 'none';
+            
+        } catch (error) {
+            console.error('Error submitting memory:', error);
+            showAlert('Failed to submit memory: ' + error.message, 'error');
+        } finally {
+            submitBtn.textContent = originalBtnText;
+            submitBtn.disabled = false;
         }
+    });
 
-        // Show alert messages
-        function showAlert(message, type) {
-            const alertDiv = document.getElementById('submission-alert');
+    function resetForm() {
+        document.getElementById('memory-form').reset();
+        document.getElementById('file-text').textContent = 'Click to select or drag file here';
+        document.getElementById('file-group').style.display = 'block';
+        document.getElementById('youtube-group').style.display = 'none';
+        document.getElementById('voice-group').style.display = 'none';
+        
+        // Reset voice recording
+        recordedBlob = null;
+        recordingSeconds = 0;
+        document.getElementById('record-time').textContent = '0:00';
+        document.getElementById('recorded-audio').style.display = 'none';
+        document.getElementById('record-status').textContent = 'Click Start to begin recording';
+    }
+
+    function showAlert(message, type) {
+        const alertDiv = document.getElementById('submission-alert');
+        if (alertDiv) {
             alertDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
             
-            // Auto hide after 5 seconds
             setTimeout(() => {
                 alertDiv.innerHTML = '';
             }, 5000);
         }
+    }
 
-        // Refresh current view
-        function refreshCurrentView() {
-            if (document.getElementById('home-section').style.display !== 'none') {
-                loadRecentMemories();
-            }
-            if (document.getElementById('memories-section').style.display !== 'none') {
-                loadAllMemories();
-            }
+    function refreshCurrentView() {
+        if (document.getElementById('home-section').style.display !== 'none') {
+            loadRecentMemories();
         }
+        if (document.getElementById('memories-section').style.display !== 'none') {
+            loadAllMemories();
+        }
+    }
 
-        // Create format text for bold an italic
-        function formatText(text) {
-            return text
+    function formatText(text) {
+        if (!text) return '';
+        return text
             .replace(/\*([^*]+)\*/g, '<strong>$1</strong>')
             .replace(/_([^_]+)_/g, '<em>$1</em>')
             .replace(/\n/g, '<br>');
-        }
+    }
+
+    // ============================================
+    // MEMORY DISPLAY FUNCTIONS
+    // ============================================
+    function createMemoryCard(memory) {
+        console.log('Creating card for memory:', memory);
         
-        // Create memory card HTML
-        function createMemoryCard(memory) {
-            console.log('Creating card for memory:', memory); // Debug log
-            
-            const date = new Date(memory.timestamp).toLocaleDateString();
-            const tags = memory.tags || [];
-            const title = memory.Title || memory.title || 'Untitled';
-            
-            let mediaHtml = '';
-            
-            // Check for YouTube video
-            if (memory.Type === 'youtube' || memory.type === 'youtube') {
-                const youtubeUrl = memory.YouTube || memory.youtube;
-                console.log('YouTube URL found:', youtubeUrl); // Debug log
-                
-                if (youtubeUrl) {
-                    const videoId = getYouTubeEmbedId(youtubeUrl);
-                    console.log('Video ID extracted:', videoId); // Debug log
-                    
-                    if (videoId) {
-                        mediaHtml = `<iframe class="memory-video" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
-                    }
-                }
-            } else if (memory.FileData && memory.FileType) {
-                if (memory.FileType.startsWith('image/')) {
-                    mediaHtml = `<img src="${memory.FileData}" alt="${title}" class="memory-media">`;
-                } else if (memory.FileType.startsWith('video/')) {
-                    mediaHtml = `<video class="memory-video" controls><source src="${memory.FileData}" type="${memory.FileType}"></video>`;
-                } else if (memory.FileType.startsWith('audio/')) {
-                    mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${memory.FileData}" type="${memory.FileType}"></audio>`;
-                }
-            } else if (memory.Attachment && memory.Attachment.length > 0) {
-                const attachment = memory.Attachment[0];
-                if (attachment.type && attachment.type.startsWith('image/')) {
-                    mediaHtml = `<img src="${attachment.url}" alt="${title}" class="memory-media">`;
-                } else if (attachment.type && attachment.type.startsWith('video/')) {
-                    mediaHtml = `<video class="memory-video" controls><source src="${attachment.url}" type="${attachment.type}"></video>`;
-                } else if (attachment.type && attachment.type.startsWith('audio/')) {
-                    mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${attachment.url}" type="${attachment.type}"></audio>`;
+        const date = new Date(memory.timestamp).toLocaleDateString();
+        const tags = memory.tags || [];
+        const title = memory.Title || memory.title || 'Untitled';
+        
+        let mediaHtml = '';
+        
+        // Check for Cloudinary URL first
+        if (memory.CloudinaryURL) {
+            const url = memory.CloudinaryURL;
+            if (url.includes('/image/')) {
+                mediaHtml = `<img src="${url}" alt="${title}" class="memory-media">`;
+            } else if (url.includes('/video/')) {
+                // Check if it's actually audio or video
+                if (memory.Type === 'voice' || memory.type === 'voice' || memory.Description?.includes('[Voice Note:')) {
+                    mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${url}" type="audio/wav"></audio>`;
+                } else {
+                    mediaHtml = `<video class="memory-video" controls><source src="${url}"></video>`;
                 }
             }
+        }
+        // Check for YouTube
+        else if (memory.Type === 'youtube' || memory.type === 'youtube') {
+            const youtubeUrl = memory.YouTube || memory.youtube;
+            console.log('YouTube URL found:', youtubeUrl);
+            
+            if (youtubeUrl) {
+                const videoId = getYouTubeEmbedId(youtubeUrl);
+                console.log('Video ID extracted:', videoId);
+                
+                if (videoId) {
+                    mediaHtml = `<iframe class="memory-video" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+                }
+            }
+        }
+        // Fallback to old FileData method (for backward compatibility)
+        else if (memory.FileData && memory.FileType) {
+            if (memory.FileType.startsWith('image/')) {
+                mediaHtml = `<img src="${memory.FileData}" alt="${title}" class="memory-media">`;
+            } else if (memory.FileType.startsWith('video/')) {
+                mediaHtml = `<video class="memory-video" controls><source src="${memory.FileData}" type="${memory.FileType}"></video>`;
+            } else if (memory.FileType.startsWith('audio/')) {
+                mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${memory.FileData}" type="${memory.FileType}"></audio>`;
+            }
+        }
+        // Check Airtable attachments
+        else if (memory.Attachment && memory.Attachment.length > 0) {
+            const attachment = memory.Attachment[0];
+            if (attachment.type && attachment.type.startsWith('image/')) {
+                mediaHtml = `<img src="${attachment.url}" alt="${title}" class="memory-media">`;
+            } else if (attachment.type && attachment.type.startsWith('video/')) {
+                mediaHtml = `<video class="memory-video" controls><source src="${attachment.url}" type="${attachment.type}"></video>`;
+            } else if (attachment.type && attachment.type.startsWith('audio/')) {
+                mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${attachment.url}" type="${attachment.type}"></audio>`;
+            }
+        }
 
-            const tagsHtml = tags.map(tag => `<span class="tag" onclick="filterByTag('${tag}')">${tag}</span>`).join('');
-            
-            const description = formatText(memory.Description || memory.description || '');
-            const submitter = memory.Submitter || memory.submitter || '';
-            
-            return `
-                <div class="memory-card" onclick="openMemoryModal('${memory.id}')">
-                    ${mediaHtml}
-                    <div class="memory-content">
-                        <h3 class="memory-title">${title}</h3>
-                        ${description ? `<p class="memory-description">${description}</p>` : ''}
-                        <div class="memory-meta">
-                            ${submitter ? `<span>By: ${submitter}</span>` : ''}
-                            <span>${date}</span>
-                        </div>
-                        ${tagsHtml ? `<div class="memory-tags">${tagsHtml}</div>` : ''}
-                        <div class="memory-actions" style="display: ${isAdmin ? 'flex' : 'none'};">
-                            <button class="btn btn-secondary btn-small" onclick="editMemory('${memory.id}', event)">Edit</button>
-                            <button class="btn btn-danger btn-small" onclick="deleteMemory('${memory.id}', event)">Delete</button>
-                        </div>
+        const tagsHtml = tags.map(tag => `<span class="tag" onclick="filterByTag('${tag}')">${tag}</span>`).join('');
+        
+        const description = formatText(memory.Description || memory.description || '');
+        const submitter = memory.Submitter || memory.submitter || '';
+        
+        return `
+            <div class="memory-card" onclick="openMemoryModal('${memory.id}')">
+                ${mediaHtml}
+                <div class="memory-content">
+                    <h3 class="memory-title">${title}</h3>
+                    ${description ? `<p class="memory-description">${description}</p>` : ''}
+                    <div class="memory-meta">
+                        ${submitter ? `<span>By: ${submitter}</span>` : ''}
+                        <span>${date}</span>
+                    </div>
+                    ${tagsHtml ? `<div class="memory-tags">${tagsHtml}</div>` : ''}
+                    <div class="memory-actions" style="display: ${isAdmin ? 'flex' : 'none'};">
+                        <button class="btn btn-secondary btn-small" onclick="editMemory('${memory.id}', event)">Edit</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteMemory('${memory.id}', event)">Delete</button>
                     </div>
                 </div>
-            `;
+            </div>
+        `;
+    }
+
+    async function loadRecentMemories() {
+        if (memories.length === 0) {
+            await fetchMemoriesFromAirtable();
         }
 
-        // Load recent memories for home page
-        async function loadRecentMemories() {
-            if (memories.length === 0) {
-                await fetchMemoriesFromAirtable();
-            }
-
-            const container = document.getElementById('recent-memories');
-            const recentMemories = memories.slice(0, 6); // Show last 6 memories
-            
-            if (recentMemories.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--accent-color); grid-column: 1/-1;">No memories shared yet. Be the first to share a precious memory!</p>';
-                return;
-            }
-            
-            container.innerHTML = recentMemories.map(memory => createMemoryCard(memory)).join('');
-        }
-
-        // Load all memories for memories page
-        async function loadAllMemories() {
-            if (memories.length === 0) {
-                await fetchMemoriesFromAirtable();
-            }
-
-            const container = document.getElementById('all-memories');
-            updateTagFilter();
-            
-            if (memories.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--accent-color); grid-column: 1/-1;">No memories shared yet.</p>';
-                return;
-            }
-            
-            container.innerHTML = memories.map(memory => createMemoryCard(memory)).join('');
-        }
-
-        // Update tag filter dropdown
-        function updateTagFilter() {
-            const tagFilter = document.getElementById('tag-filter');
-            const allTags = [...new Set(memories.flatMap(memory => memory.tags || []))];
-            
-            tagFilter.innerHTML = '<option value="">All Categories</option>' + 
-                allTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
-        }
-
-        // Filter memories by search and tags
-        function filterMemories() {
-            const searchTerm = document.getElementById('search-memories').value.toLowerCase();
-            const selectedTag = document.getElementById('tag-filter').value;
-            
-            let filteredMemories = memories;
-            
-            // Filter by search term
-            if (searchTerm) {
-                filteredMemories = filteredMemories.filter(memory =>
-                    (memory.Title || '').toLowerCase().includes(searchTerm) ||
-                    (memory.Description || '').toLowerCase().includes(searchTerm) ||
-                    (memory.Submitter || '').toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            // Filter by tag
-            if (selectedTag) {
-                filteredMemories = filteredMemories.filter(memory =>
-                    memory.tags && memory.tags.includes(selectedTag)
-                );
-            }
-            
-            const container = document.getElementById('all-memories');
-            if (filteredMemories.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: var(--accent-color); grid-column: 1/-1;">No memories match your search criteria.</p>';
-            } else {
-                container.innerHTML = filteredMemories.map(memory => createMemoryCard(memory)).join('');
-            }
-        }
-
-        // Event listeners for search and filter
-        document.getElementById('search-memories').addEventListener('input', filterMemories);
-        document.getElementById('tag-filter').addEventListener('change', filterMemories);
-
-        // Clear filters function
-        function clearFilters() {
-            document.getElementById('search-memories').value = '';
-            document.getElementById('tag-filter').value = '';
-            loadAllMemories();
-        }
-
-        // Filter by tag when tag is clicked
-        function filterByTag(tag) {
-            if (document.getElementById('memories-section').style.display === 'none') {
-                showSection('memories');
-            }
-            
-            setTimeout(() => {
-                document.getElementById('tag-filter').value = tag;
-                filterMemories();
-            }, 100);
-        }
-
-        // Open memory detail modal
-        function openMemoryModal(memoryId) {
-            const memory = memories.find(m => m.id === memoryId);
-            if (!memory) return;
-            
-            console.log('Opening modal for memory:', memory); // Debug log
-            
-            const modal = document.getElementById('memory-modal');
-            const content = document.getElementById('modal-content');
-            const title = memory.Title || memory.title || 'Untitled';
-            
-            let mediaHtml = '';
-            
-            // Check for YouTube video
-            if ((memory.Type === 'youtube' || memory.type === 'youtube')) {
-                const youtubeUrl = memory.YouTube || memory.youtube;
-                console.log('Modal YouTube URL:', youtubeUrl); // Debug log
-                
-                if (youtubeUrl) {
-                    const videoId = getYouTubeEmbedId(youtubeUrl);
-                    console.log('Modal Video ID:', videoId); // Debug log
-                    
-                    if (videoId) {
-                        mediaHtml = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
-                    }
-                }
-            } else if (memory.FileData && memory.FileType) {
-                if (memory.FileType.startsWith('image/')) {
-                    mediaHtml = `<img src="${memory.FileData}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
-                } else if (memory.FileType.startsWith('video/')) {
-                    mediaHtml = `<video width="100%" height="315" controls><source src="${memory.FileData}" type="${memory.FileType}"></video>`;
-                } else if (memory.FileType.startsWith('audio/')) {
-                    mediaHtml = `<audio controls style="width: 100%;"><source src="${memory.FileData}" type="${memory.FileType}"></audio>`;
-                }
-            } else if (memory.Attachment && memory.Attachment.length > 0) {
-                const attachment = memory.Attachment[0];
-                if (attachment.type && attachment.type.startsWith('image/')) {
-                    mediaHtml = `<img src="${attachment.url}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
-                } else if (attachment.type && attachment.type.startsWith('video/')) {
-                    mediaHtml = `<video width="100%" height="315" controls><source src="${attachment.url}" type="${attachment.type}"></video>`;
-                } else if (attachment.type && attachment.type.startsWith('audio/')) {
-                    mediaHtml = `<audio controls style="width: 100%;"><source src="${attachment.url}" type="${attachment.type}"></audio>`;
-                }
-            }
-            
-            const date = new Date(memory.timestamp).toLocaleDateString();
-            const tags = memory.tags || [];
-            const tagsHtml = tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-            
-            const description = formatText(memory.Description || memory.description || '');
-            const submitter = memory.Submitter || memory.submitter || 'Anonymous';
-            
-            content.innerHTML = `
-                ${mediaHtml}
-                <h2 style="margin: 20px 0 10px 0;">${title}</h2>
-                <p style="color: var(--accent-color); margin-bottom: 15px;">Shared by ${submitter} on ${date}</p>
-                ${tagsHtml ? `<div style="margin-bottom: 15px;">${tagsHtml}</div>` : ''}
-                <div style="line-height: 1.8;">${description}</div>
-            `;
-            
-            modal.classList.add('show');
-            window.currentMemoryId = memoryId; // Store for sharing
-        }
-
-        // Admin functions
-        function showAdminPanel() {
-            document.getElementById('admin-panel').classList.add('show');
-        }
-
-        function adminLogin() {
-            const password = document.getElementById('admin-password').value;
-            if (password === 'admin123') {
-                isAdmin = true;
-                localStorage.setItem('isAdmin', 'true');
-                document.getElementById('admin-login').style.display = 'none';
-                document.getElementById('admin-dashboard').classList.add('show');
-                
-                // Initialize Airtable configuration in admin panel
-                initializeAirtableConfig();
-                testAirtableConnection();
-                
-                updateAdminStats();
-                loadExistingTags();
-                refreshCurrentView();
-
-                // Manually show admin controls on all memory cards
-                document.querySelectorAll('.memory-actions').forEach(actions => {
-                    actions.style.display = 'flex';
-                });
-            } else {
-                alert('Incorrect password');
-            }
-        }
-
-        function adminLogout() {
-            isAdmin = false;
-            localStorage.removeItem('isAdmin');
-            document.getElementById('admin-panel').classList.remove('show');
-            document.getElementById('admin-login').style.display = 'block';
-            document.getElementById('admin-dashboard').classList.remove('show');
-            document.getElementById('admin-password').value = '';
-            refreshCurrentView();
-
-            // Manually hide admin controls on all memory cards
-            document.querySelectorAll('.memory-actions').forEach(actions => {
-                actions.style.display = 'none';
-            });
-        }
-
-        function updateAdminStats() {
-            document.getElementById('total-memories').textContent = memories.length;
-            document.getElementById('total-tags').textContent = [...new Set(memories.flatMap(m => m.tags || []))].length;
-            
-            // Count memories from last 7 days
-            const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-            const recentCount = memories.filter(m => new Date(m.timestamp) > weekAgo).length;
-            document.getElementById('recent-submissions').textContent = recentCount;
-        }
-
-        function loadExistingTags() {
-            const container = document.getElementById('existing-tags');
-            const allTags = [...new Set(memories.flatMap(memory => memory.tags || []))];
-            
-            container.innerHTML = allTags.map(tag => `
-                <div class="tag-removable">
-                    ${tag}
-                    <button class="tag-remove-btn" onclick="removeTag('${tag}')">×</button>
-                </div>
-            `).join('');
-        }
-
-        async function editMemory(memoryId, event) {
-            event.stopPropagation();
-            const memory = memories.find(m => m.id === memoryId);
-            if (!memory) return;
-            
-            currentEditingMemory = memory;
-            document.getElementById('edit-title').value = memory.Title;
-            document.getElementById('edit-description').value = memory.Description;
-            document.getElementById('edit-tags').value = (memory.tags || []).join(', ');
-            
-            document.getElementById('edit-modal').classList.add('show');
-        }
-
-        async function deleteMemory(memoryId, event) {
-            event.stopPropagation();
-            if (confirm('Are you sure you want to delete this memory?')) {
-                try {
-                    await deleteMemoryFromAirtable(memoryId);
-                    memories = memories.filter(m => m.id !== memoryId);
-                    
-                    refreshCurrentView();
-                    updateAdminStats();
-                } catch (error) {
-                    showAlert('Failed to delete memory. Please try again.', 'error');
-                }
-            }
-        }
-
-        // Edit form submission
-        document.getElementById('edit-memory-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (!currentEditingMemory) return;
-            
-            try {
-                const updateData = {
-                    title: document.getElementById('edit-title').value,
-                    description: document.getElementById('edit-description').value,
-                    tags: document.getElementById('edit-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
-                };
-
-                await updateMemoryInAirtable(currentEditingMemory.id, updateData);
-                
-                // Update local memory
-                currentEditingMemory.Title = updateData.title;
-                currentEditingMemory.Description = updateData.description;
-                currentEditingMemory.tags = updateData.tags;
-                
-                closeEditModal();
-                refreshCurrentView();
-                loadExistingTags();
-            } catch (error) {
-                showAlert('Failed to update memory. Please try again.', 'error');
-            }
-        });
-
-        function closeEditModal() {
-            document.getElementById('edit-modal').classList.remove('show');
-            currentEditingMemory = null;
-        }
-
-        function exportData() {
-            const dataStr = JSON.stringify(memories, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = 'memorial-memories.json';
-            link.click();
-        }
-
-        async function clearAllData() {
-            if (confirm('Are you sure you want to delete ALL memories? This cannot be undone.')) {
-                try {
-                    // This would require batch delete API calls to Airtable
-                    alert('For safety, please delete memories individually or contact support for bulk deletion.');
-                } catch (error) {
-                    showAlert('Failed to clear data.', 'error');
-                }
-            }
-        }
-
-        // Modal functions
-        function closeModal() {
-            document.getElementById('memory-modal').classList.remove('show');
-        }
-
-        function shareCurrentMemory() {
-            const memoryId = window.currentMemoryId;
-            if (!memoryId) return;
-            
-            const url = `${window.location.origin}/memory/${memoryId}`;
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Memorial Memory',
-                    url: url
-                });
-            } else {
-                navigator.clipboard.writeText(url).then(() => {
-                    alert('Link copied to clipboard!');
-                });
-            }
-        }
-
-        // Voice recording functionality
-        function initializeVoiceRecording() {
-            const startBtn = document.getElementById('start-record');
-            const pauseBtn = document.getElementById('pause-record');
-            const stopBtn = document.getElementById('stop-record');
-            const playBtn = document.getElementById('play-record');
-            const statusText = document.getElementById('record-status');
-            const timeDisplay = document.getElementById('record-time');
-            const audioElement = document.getElementById('recorded-audio');
-
-            startBtn.addEventListener('click', async function() {
-                try {
-                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    audioChunks = [];
-                    recordingSeconds = 0;
-            
-                    mediaRecorder = new MediaRecorder(stream);
-            
-                    mediaRecorder.ondataavailable = function(event) {
-                         audioChunks.push(event.data);
-                    };
-            
-                    mediaRecorder.onstop = function() {
-                         recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                         const audioUrl = URL.createObjectURL(recordedBlob);
-                         audioElement.src = audioUrl;
-                         audioElement.style.display = 'block';
-                
-                         // Stop all tracks
-                         stream.getTracks().forEach(track => track.stop());
-                    };
-            
-                    mediaRecorder.start();
-            
-                    // Update UI
-                    startBtn.disabled = true;
-                    pauseBtn.disabled = false;
-                    stopBtn.disabled = false;
-                    statusText.textContent = 'Recording...';
-            
-                    // Start timer
-                    recordingTimer = setInterval(() => {
-                         recordingSeconds++;
-                         const minutes = Math.floor(recordingSeconds / 60);
-                         const seconds = recordingSeconds % 60;
-                         timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                    }, 1000);
-            
-                } catch (error) {
-                    statusText.textContent = 'Error: Could not access microphone';
-                }
-            });
-
-            pauseBtn.addEventListener('click', function() {
-                if (mediaRecorder && !isPaused) {
-                    mediaRecorder.pause();
-                    isPaused = true;
-                    pauseBtn.textContent = '▶️ Resume';
-                    statusText.textContent = 'Recording paused';
-                    clearInterval(recordingTimer);
-                } else if (mediaRecorder && isPaused) {
-                    mediaRecorder.resume();
-                    isPaused = false;
-                    pauseBtn.textContent = '⏸️ Pause';
-                    statusText.textContent = 'Recording...';
-                    recordingTimer = setInterval(() => {
-                        recordingSeconds++;
-                        const minutes = Math.floor(recordingSeconds / 60);
-                        const seconds = recordingSeconds % 60;
-                        timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                    }, 1000);
-                }
-            });
-
-            stopBtn.addEventListener('click', function() {
-                if (mediaRecorder) {
-                    mediaRecorder.stop();
-                    clearInterval(recordingTimer);
-
-                    // Update UI
-                    startBtn.disabled = false;
-                    pauseBtn.disabled = true;
-                    stopBtn.disabled = true;
-                    playBtn.disabled = false;
-                    statusText.textContent = 'Recording complete. Click Play to review.';
-                    isPaused = false;
-                    pauseBtn.textContent = '⏸️ Pause';
-                }
-            });
-
-            playBtn.addEventListener('click', function() {
-                if (audioElement.src) {
-                    audioElement.play();
-                }
-            });
+        const container = document.getElementById('recent-memories');
+        if (!container) return;
+        
+        const recentMemories = memories.slice(0, 6);
+        
+        if (recentMemories.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--accent-color); grid-column: 1/-1;">No memories shared yet. Be the first to share a precious memory!</p>';
+            return;
         }
         
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async function() {
-            await initializeAirtable();
-            initializeVoiceRecording();
-            
-            // Check if admin is logged in
-            if (localStorage.getItem('isAdmin') === 'true') {
-                isAdmin = true;
-            }
+        container.innerHTML = recentMemories.map(memory => createMemoryCard(memory)).join('');
+    }
 
-            showSection('home');
+    async function loadAllMemories() {
+        if (memories.length === 0) {
+            await fetchMemoriesFromAirtable();
+        }
+
+        const container = document.getElementById('all-memories');
+        if (!container) return;
+        
+        updateTagFilter();
+        
+        if (memories.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--accent-color); grid-column: 1/-1;">No memories shared yet.</p>';
+            return;
+        }
+        
+        container.innerHTML = memories.map(memory => createMemoryCard(memory)).join('');
+    }
+
+    function updateTagFilter() {
+        const tagFilter = document.getElementById('tag-filter');
+        if (!tagFilter) return;
+        
+        const allTags = [...new Set(memories.flatMap(memory => memory.tags || []))];
+        
+        tagFilter.innerHTML = '<option value="">All Categories</option>' + 
+            allTags.map(tag => `<option value="${tag}">${tag}</option>`).join('');
+    }
+
+    function filterMemories() {
+        const searchInput = document.getElementById('search-memories');
+        const tagFilter = document.getElementById('tag-filter');
+        
+        if (!searchInput || !tagFilter) return;
+        
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedTag = tagFilter.value;
+        
+        let filteredMemories = memories;
+        
+        if (searchTerm) {
+            filteredMemories = filteredMemories.filter(memory =>
+                (memory.Title || '').toLowerCase().includes(searchTerm) ||
+                (memory.Description || '').toLowerCase().includes(searchTerm) ||
+                (memory.Submitter || '').toLowerCase().includes(searchTerm)
+            );
+        }
+        
+        if (selectedTag) {
+            filteredMemories = filteredMemories.filter(memory =>
+                memory.tags && memory.tags.includes(selectedTag)
+            );
+        }
+        
+        const container = document.getElementById('all-memories');
+        if (!container) return;
+        
+        if (filteredMemories.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--accent-color); grid-column: 1/-1;">No memories match your search criteria.</p>';
+        } else {
+            container.innerHTML = filteredMemories.map(memory => createMemoryCard(memory)).join('');
+        }
+    }
+
+    const searchInput = document.getElementById('search-memories');
+    const tagFilterEl = document.getElementById('tag-filter');
+    if (searchInput) searchInput.addEventListener('input', filterMemories);
+    if (tagFilterEl) tagFilterEl.addEventListener('change', filterMemories);
+
+    function clearFilters() {
+        const searchInput = document.getElementById('search-memories');
+        const tagFilter = document.getElementById('tag-filter');
+        
+        if (searchInput) searchInput.value = '';
+        if (tagFilter) tagFilter.value = '';
+        
+        loadAllMemories();
+    }
+
+    function filterByTag(tag) {
+        if (document.getElementById('memories-section').style.display === 'none') {
+            showSection('memories');
+        }
+        
+        setTimeout(() => {
+            const tagFilter = document.getElementById('tag-filter');
+            if (tagFilter) {
+                tagFilter.value = tag;
+                filterMemories();
+            }
+        }, 100);
+    }
+
+    // ============================================
+    // MODAL FUNCTIONS
+    // ============================================
+    function openMemoryModal(memoryId) {
+        const memory = memories.find(m => m.id === memoryId);
+        if (!memory) return;
+        
+        console.log('Opening modal for memory:', memory);
+        
+        const modal = document.getElementById('memory-modal');
+        const content = document.getElementById('modal-content');
+        const title = memory.Title || memory.title || 'Untitled';
+        
+        let mediaHtml = '';
+        
+        // Check for Cloudinary URL first
+        if (memory.CloudinaryURL) {
+            const url = memory.CloudinaryURL;
+            if (url.includes('/image/')) {
+                mediaHtml = `<img src="${url}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
+            } else if (url.includes('/video/')) {
+                if (memory.Type === 'voice' || memory.type === 'voice' || memory.Description?.includes('[Voice Note:')) {
+                    mediaHtml = `<audio controls style="width: 100%;"><source src="${url}" type="audio/wav"></audio>`;
+                } else {
+                    mediaHtml = `<video width="100%" height="315" controls><source src="${url}"></video>`;
+                }
+            }
+        }
+        // Check for YouTube
+        else if ((memory.Type === 'youtube' || memory.type === 'youtube')) {
+            const youtubeUrl = memory.YouTube || memory.youtube;
+            console.log('Modal YouTube URL:', youtubeUrl);
+            
+            if (youtubeUrl) {
+                const videoId = getYouTubeEmbedId(youtubeUrl);
+                console.log('Modal Video ID:', videoId);
+                
+                if (videoId) {
+                    mediaHtml = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+                }
+            }
+        }
+        // Fallback to old methods
+        else if (memory.FileData && memory.FileType) {
+            if (memory.FileType.startsWith('image/')) {
+                mediaHtml = `<img src="${memory.FileData}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
+            } else if (memory.FileType.startsWith('video/')) {
+                mediaHtml = `<video width="100%" height="315" controls><source src="${memory.FileData}" type="${memory.FileType}"></video>`;
+            } else if (memory.FileType.startsWith('audio/')) {
+                mediaHtml = `<audio controls style="width: 100%;"><source src="${memory.FileData}" type="${memory.FileType}"></audio>`;
+            }
+        } else if (memory.Attachment && memory.Attachment.length > 0) {
+            const attachment = memory.Attachment[0];
+            if (attachment.type && attachment.type.startsWith('image/')) {
+                mediaHtml = `<img src="${attachment.url}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
+            } else if (attachment.type && attachment.type.startsWith('video/')) {
+                mediaHtml = `<video width="100%" height="315" controls><source src="${attachment.url}" type="${attachment.type}"></video>`;
+            } else if (attachment.type && attachment.type.startsWith('audio/')) {
+                mediaHtml = `<audio controls style="width: 100%;"><source src="${attachment.url}" type="${attachment.type}"></audio>`;
+            }
+        }
+        
+        const date = new Date(memory.timestamp).toLocaleDateString();
+        const tags = memory.tags || [];
+        const tagsHtml = tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+        
+        const description = formatText(memory.Description || memory.description || '');
+        const submitter = memory.Submitter || memory.submitter || 'Anonymous';
+        
+        content.innerHTML = `
+            ${mediaHtml}
+            <h2 style="margin: 20px 0 10px 0;">${title}</h2>
+            <p style="color: var(--accent-color); margin-bottom: 15px;">Shared by ${submitter} on ${date}</p>
+            ${tagsHtml ? `<div style="margin-bottom: 15px;">${tagsHtml}</div>` : ''}
+            <div style="line-height: 1.8;">${description}</div>
+        `;
+        
+        modal.classList.add('show');
+        window.currentMemoryId = memoryId;
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('memory-modal');
+        if (modal) modal.classList.remove('show');
+    }
+
+    function shareCurrentMemory() {
+        const memoryId = window.currentMemoryId;
+        if (!memoryId) return;
+        
+        const url = `${window.location.origin}/memory/${memoryId}`;
+        if (navigator.share) {
+            navigator.share({
+                title: 'Memorial Memory',
+                url: url
+            });
+        } else {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        }
+    }
+
+    // ============================================
+    // ADMIN FUNCTIONS
+    // ============================================
+    function showAdminPanel() {
+        const panel = document.getElementById('admin-panel');
+        if (panel) panel.classList.add('show');
+    }
+
+    function adminLogin() {
+        const password = document.getElementById('admin-password').value;
+        if (password === 'admin123') {
+            isAdmin = true;
+            localStorage.setItem('isAdmin', 'true');
+            document.getElementById('admin-login').style.display = 'none';
+            document.getElementById('admin-dashboard').classList.add('show');
+            
+            initializeAirtableConfig();
+            testAirtableConnection();
+            
+            updateAdminStats();
+            loadExistingTags();
+            refreshCurrentView();
+
+            document.querySelectorAll('.memory-actions').forEach(actions => {
+                actions.style.display = 'flex';
+            });
+        } else {
+            alert('Incorrect password');
+        }
+    }
+
+    function adminLogout() {
+        isAdmin = false;
+        localStorage.removeItem('isAdmin');
+        const panel = document.getElementById('admin-panel');
+        if (panel) panel.classList.remove('show');
+        document.getElementById('admin-login').style.display = 'block';
+        document.getElementById('admin-dashboard').classList.remove('show');
+        document.getElementById('admin-password').value = '';
+        refreshCurrentView();
+
+        document.querySelectorAll('.memory-actions').forEach(actions => {
+            actions.style.display = 'none';
+        });
+    }
+
+    function updateAdminStats() {
+        const totalEl = document.getElementById('total-memories');
+        const tagsEl = document.getElementById('total-tags');
+        const recentEl = document.getElementById('recent-submissions');
+        
+        if (totalEl) totalEl.textContent = memories.length;
+        if (tagsEl) tagsEl.textContent = [...new Set(memories.flatMap(m => m.tags || []))].length;
+        
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const recentCount = memories.filter(m => new Date(m.timestamp) > weekAgo).length;
+        if (recentEl) recentEl.textContent = recentCount;
+    }
+
+    function loadExistingTags() {
+        const container = document.getElementById('existing-tags');
+        if (!container) return;
+        
+        const allTags = [...new Set(memories.flatMap(memory => memory.tags || []))];
+        
+        container.innerHTML = allTags.map(tag => `
+            <div class="tag-removable">
+                ${tag}
+                <button class="tag-remove-btn" onclick="removeTag('${tag}')">×</button>
+            </div>
+        `).join('');
+    }
+
+    async function editMemory(memoryId, event) {
+        event.stopPropagation();
+        const memory = memories.find(m => m.id === memoryId);
+        if (!memory) return;
+        
+        currentEditingMemory = memory;
+        document.getElementById('edit-title').value = memory.Title;
+        document.getElementById('edit-description').value = memory.Description;
+        document.getElementById('edit-tags').value = (memory.tags || []).join(', ');
+        
+        document.getElementById('edit-modal').classList.add('show');
+    }
+
+    async function deleteMemory(memoryId, event) {
+        event.stopPropagation();
+        if (confirm('Are you sure you want to delete this memory?')) {
+            try {
+                await deleteMemoryFromAirtable(memoryId);
+                memories = memories.filter(m => m.id !== memoryId);
+                
+                refreshCurrentView();
+                updateAdminStats();
+            } catch (error) {
+                showAlert('Failed to delete memory. Please try again.', 'error');
+            }
+        }
+    }
+
+    document.getElementById('edit-memory-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!currentEditingMemory) return;
+        
+        try {
+            const updateData = {
+                title: document.getElementById('edit-title').value,
+                description: document.getElementById('edit-description').value,
+                tags: document.getElementById('edit-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
+            };
+
+            await updateMemoryInAirtable(currentEditingMemory.id, updateData);
+            
+            currentEditingMemory.Title = updateData.title;
+            currentEditingMemory.Description = updateData.description;
+            currentEditingMemory.tags = updateData.tags;
+            
+            closeEditModal();
+            refreshCurrentView();
+            loadExistingTags();
+        } catch (error) {
+            showAlert('Failed to update memory. Please try again.', 'error');
+        }
+    });
+
+    function closeEditModal() {
+        const modal = document.getElementById('edit-modal');
+        if (modal) modal.classList.remove('show');
+        currentEditingMemory = null;
+    }
+
+    function exportData() {
+        const dataStr = JSON.stringify(memories, null, 2);
+        const dataBlob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'memorial-memories.json';
+        link.click();
+    }
+
+    async function clearAllData() {
+        if (confirm('Are you sure you want to delete ALL memories? This cannot be undone.')) {
+            alert('For safety, please delete memories individually or contact support for bulk deletion.');
+        }
+    }
+
+    // ============================================
+    // VOICE RECORDING
+    // ============================================
+    function initializeVoiceRecording() {
+        const startBtn = document.getElementById('start-record');
+        const pauseBtn = document.getElementById('pause-record');
+        const stopBtn = document.getElementById('stop-record');
+        const playBtn = document.getElementById('play-record');
+        const statusText = document.getElementById('record-status');
+        const timeDisplay = document.getElementById('record-time');
+        const audioElement = document.getElementById('recorded-audio');
+
+        if (!startBtn || !pauseBtn || !stopBtn || !playBtn) return;
+
+        startBtn.addEventListener('click', async function() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunks = [];
+                recordingSeconds = 0;
+        
+                mediaRecorder = new MediaRecorder(stream);
+        
+                mediaRecorder.ondataavailable = function(event) {
+                     audioChunks.push(event.data);
+                };
+        
+                mediaRecorder.onstop = function() {
+                     recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                     const audioUrl = URL.createObjectURL(recordedBlob);
+                     audioElement.src = audioUrl;
+                     audioElement.style.display = 'block';
+            
+                     stream.getTracks().forEach(track => track.stop());
+                };
+        
+                mediaRecorder.start();
+        
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                stopBtn.disabled = false;
+                statusText.textContent = 'Recording...';
+        
+                recordingTimer = setInterval(() => {
+                     recordingSeconds++;
+                     const minutes = Math.floor(recordingSeconds / 60);
+                     const seconds = recordingSeconds % 60;
+                     timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+        
+            } catch (error) {
+                statusText.textContent = 'Error: Could not access microphone';
+            }
         });
 
-        // Close modals when clicking outside
-        document.getElementById('memory-modal').addEventListener('click', function(e) {
+        pauseBtn.addEventListener('click', function() {
+            if (mediaRecorder && !isPaused) {
+                mediaRecorder.pause();
+                isPaused = true;
+                pauseBtn.textContent = '▶️ Resume';
+                statusText.textContent = 'Recording paused';
+                clearInterval(recordingTimer);
+            } else if (mediaRecorder && isPaused) {
+                mediaRecorder.resume();
+                isPaused = false;
+                pauseBtn.textContent = '⏸️ Pause';
+                statusText.textContent = 'Recording...';
+                recordingTimer = setInterval(() => {
+                    recordingSeconds++;
+                    const minutes = Math.floor(recordingSeconds / 60);
+                    const seconds = recordingSeconds % 60;
+                    timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+        });
+
+        stopBtn.addEventListener('click', function() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+                clearInterval(recordingTimer);
+
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                stopBtn.disabled = true;
+                playBtn.disabled = false;
+                statusText.textContent = 'Recording complete. Click Play to review.';
+                isPaused = false;
+                pauseBtn.textContent = '⏸️ Pause';
+            }
+        });
+
+        playBtn.addEventListener('click', function() {
+            if (audioElement.src) {
+                audioElement.play();
+            }
+        });
+    }
+
+    // Placeholder tag functions
+    function addTag() {
+        alert('Tag management will be implemented with Airtable integration.');
+    }
+
+    function removeTag(tag) {
+        alert('Tag removal will be implemented with Airtable integration.');
+    }
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', async function() {
+        await initializeAirtable();
+        initializeVoiceRecording();
+        
+        if (localStorage.getItem('isAdmin') === 'true') {
+            isAdmin = true;
+        }
+
+        showSection('home');
+    });
+
+    // Close modals when clicking outside
+    const memoryModal = document.getElementById('memory-modal');
+    const editModal = document.getElementById('edit-modal');
+    
+    if (memoryModal) {
+        memoryModal.addEventListener('click', function(e) {
             if (e.target === this) closeModal();
         });
+    }
 
-        document.getElementById('edit-modal').addEventListener('click', function(e) {
+    if (editModal) {
+        editModal.addEventListener('click', function(e) {
             if (e.target === this) closeEditModal();
         });
+    }
 
-        // Enter key for tag input
-        document.getElementById('new-tag-input').addEventListener('keypress', function(e) {
+    // Enter key for tag input
+    const tagInput = document.getElementById('new-tag-input');
+    if (tagInput) {
+        tagInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 addTag();
             }
         });
-
-        // Placeholder functions for tag management (to be implemented with Airtable)
-        function addTag() {
-            alert('Tag management will be implemented with Airtable integration.');
-        }
-
-        function removeTag(tag) {
-            alert('Tag removal will be implemented with Airtable integration.');
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
