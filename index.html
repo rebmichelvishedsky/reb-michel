@@ -875,25 +875,15 @@
         </div>
     </div>
 
-    <footer onclick="footerClickCount()">
-        <div class="container">
-            <p id="footer-text">In loving memory of Reb Michel Vishedsky ע"ה</p>
-            <p id="contact-text">Contact: rebmichelvishedsky@gmail.com</p>
-        </div>
+    <footer>
+    <div class="container">
+        <p id="footer-text">In loving memory of Reb Michel Vishedsky ע"ה</p>
+        <p id="contact-text">Contact: rebmichelvishedsky@gmail.com</p>
+        <p style="margin-top: 10px;">
+            <a href="#" onclick="showAdminPanel(); return false;" style="font-size: 9px; color: #d1d5db; text-decoration: none; opacity: 0.3;">•</a>
+        </p>
+    </div>
     </footer>
-
-    <script>
-        let footerClicks = 0;
-        function footerClickCount() {
-            footerClicks++;
-            if (footerClicks === 3) {
-                showAdminPanel();
-                footerClicks = 0;
-            }
-            // Reset counter after 2 seconds of no clicks
-            setTimeout(() => footerClicks = 0, 2000);
-        }
-    </script>
     
     <script>
     // ============================================
