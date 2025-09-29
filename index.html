@@ -306,24 +306,6 @@
             background: var(--hover-color);
         }
 
-        /* YouTube Video Upload Section */
-        .youtube-upload-section {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 40px;
-            border-left: 4px solid #ff0000;
-        }
-
-        .youtube-upload-section h3 {
-            color: #ff0000;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
         /* Memory Grid */
         .memories-grid {
             display: grid;
@@ -820,35 +802,6 @@
                         <button type="submit" class="btn btn-primary" id="submit-btn">Share Memory</button>
                     </form>
                 </div>
-
-                <!-- YouTube Video Upload Section -->
-                <div class="youtube-upload-section">
-                    <h3>🎬 Upload Video to YouTube</h3>
-                    <p style="margin-bottom: 20px; color: var(--accent-color);">
-                        Upload videos directly to YouTube and share them on the memorial site.
-                    </p>
-                    
-                    <form id="uploadForm">
-                        <div class="form-group">
-                            <label for="videoFile">Select Video File</label>
-                            <input type="file" id="videoFile" name="video" accept="video/*" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="title">Video Title</label>
-                            <input type="text" id="title" name="title" placeholder="Video Title" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="description">Video Description</label>
-                            <textarea id="description" name="description" placeholder="Video Description"></textarea>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Upload to YouTube</button>
-                    </form>
-                    
-                    <div id="status" style="margin-top: 15px; padding: 10px; border-radius: 6px;"></div>
-                </div>
             </div>
 
             <!-- About Section -->
@@ -856,7 +809,7 @@
                 <div style="background: white; padding: 40px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                     <h2 id="about-title">About Reb Michel Vishedsky</h2>
                     <div id="about-content">
-                        <p>This memorial website is dedicated to preserving and sharing the precious memories of Reb Michel Vishedsky (הרב מיכל וישצקי).</p>
+                        <p>This website is dedicated to preserving and sharing the precious memories of Reb Michel Vishedsky.</p>
                         <p>Here, family, friends, and all those whose lives he touched can share photos, videos, stories, and memories that celebrate his life, teachings, and the impact he had on our community.</p>
                         <p>Every memory shared here contributes to keeping his legacy alive for future generations.</p>
                     </div>
@@ -987,64 +940,6 @@
         let recordingTimer = null;
         let recordingSeconds = 0;
         let isPaused = false;
-
-        // YouTube Video Upload Form Handler
-        const form = document.getElementById('uploadForm');
-        const statusDiv = document.getElementById('status');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const formData = new FormData();
-            formData.append('video', document.getElementById('videoFile').files[0]);
-            formData.append('title', document.getElementById('title').value);
-            formData.append('description', document.getElementById('description').value);
-
-            statusDiv.style.backgroundColor = '#e3f2fd';
-            statusDiv.style.color = '#1976d2';
-            statusDiv.innerText = "Uploading... please wait.";
-
-            try {
-                const res = await fetch("https://reb-michel-video-backend.onrender.com/upload", {
-                    method: "POST",
-                    body: formData
-                });
-
-                const responseText = await res.text();
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                    } catch (e) {
-                  // If it's not JSON, treat the response as an error message
-                    statusDiv.style.backgroundColor = '#f8d7da';
-                    statusDiv.style.color = '#721c24';
-                    statusDiv.innerText = "❌ " + responseText;
-                    return;
-                }
-                if (data.videoId) {
-                    statusDiv.style.backgroundColor = '#d4edda';
-                    statusDiv.style.color = '#155724';
-                    statusDiv.innerHTML = `✅ Uploaded! <a target="_blank" href="https://youtube.com/watch?v=${data.videoId}">Watch on YouTube</a>`;
-                    
-                    // Reset form
-                    form.reset();
-                    
-                    // Optionally, you can automatically add this to the memorial site
-                    // by filling in the YouTube URL field in the memory form
-                    document.getElementById('youtube-url').value = `https://youtube.com/watch?v=${data.videoId}`;
-                    document.getElementById('memory-type').value = 'youtube';
-                    document.getElementById('memory-type').dispatchEvent(new Event('change'));
-                } else {
-                    statusDiv.style.backgroundColor = '#f8d7da';
-                    statusDiv.style.color = '#721c24';
-                    statusDiv.innerText = "❌ Upload failed: " + JSON.stringify(data);
-                }
-            } catch (err) {
-                statusDiv.style.backgroundColor = '#fff3cd';
-                statusDiv.style.color = '#856404';
-                statusDiv.innerText = "⚠️ Error: " + err.message;
-            }
-        });
 
         // Initialize Airtable configuration
         function initializeAirtableConfig() {
@@ -2036,4 +1931,3 @@
     </script>
 </body>
 </html>
-
