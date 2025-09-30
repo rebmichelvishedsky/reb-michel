@@ -2188,6 +2188,34 @@ document.getElementById('memory-modal').addEventListener('DOMContentLoaded', fun
         if (url) renderPdfPage(url, canvas.id);
     });
 });
+
+async function loadPdfPages(url, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Toggle visibility
+    if (container.style.display === 'none') {
+        container.style.display = 'block';
+        container.innerHTML = '<p>Loading PDF pages...</p>';
+        
+        try {
+            // For Cloudinary PDFs uploaded as images, we can convert each page
+            const totalPages = 10; // Estimate, or you could use pdf.js to get actual count
+            let pagesHtml = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const pageUrl = url.replace('/image/upload/', `/image/upload/f_jpg,pg_${i}/`).replace('.pdf', '.jpg');
+                pagesHtml += `<img src="${pageUrl}" style="width: 100%; margin-bottom: 15px; border: 1px solid var(--border-color);" onerror="this.style.display='none'" alt="Page ${i}">`;
+            }
+            
+            container.innerHTML = pagesHtml;
+        } catch (error) {
+            container.innerHTML = '<p>Error loading PDF pages</p>';
+        }
+    } else {
+        container.style.display = 'none';
+    }
+}
 </script>
 </body>
 </html>
