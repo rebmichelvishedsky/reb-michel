@@ -1714,13 +1714,16 @@
             const url = memory.CloudinaryURL;
             if (url.includes('/image/')) {
                 mediaHtml = `<img src="${url}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
-            } else if (url.includes('/video/')) {
+                } else if (url.includes('/video/')) {
                 if (memory.Type === 'voice' || memory.type === 'voice' || memory.Description?.includes('[Voice Note:')) {
                     mediaHtml = `<audio controls style="width: 100%;"><source src="${url}" type="audio/wav"></audio>`;
-                } else {
+                    } else {
                     mediaHtml = `<video width="100%" height="315" controls><source src="${url}"></video>`;
-                }
-            }
+                    }
+                } else if (memory.Type === 'document' || memory.type === 'document' || url.includes('.pdf')) {
+                mediaHtml = `<iframe src="${url}" width="100%" height="500" style="border: 1px solid var(--border-color);"></iframe>`;
+         }
+        }
         }
         // Check for YouTube
         else if ((memory.Type === 'youtube' || memory.type === 'youtube')) {
