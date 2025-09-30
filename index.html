@@ -991,6 +991,11 @@
             formData.append('file', file);
             formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
             formData.append('folder', 'memorial_site');
+
+            // Make raw files publicly accessible
+            if (resourceType === 'raw') {
+                formData.append('access_mode', 'public');
+            }
             
             // Determine the upload endpoint based on resource type
             const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/${resourceType}/upload`;
