@@ -1524,8 +1524,21 @@
                 } else {
                     mediaHtml = `<video class="memory-video" controls><source src="${url}"></video>`;
                 }
-                } else if (url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
+                } else if (url.includes('.pdf') || url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
                 const pdfId = 'pdf-' + memory.id;
+                const pdfId = 'pdf-' + memory.id;
+// Check if PDF was uploaded as image type (can be converted) or raw (needs download)
+if (url.includes('/image/upload/') && url.includes('.pdf')) {
+    const imageUrl = url.replace('/image/upload/', '/image/upload/f_jpg,pg_1/').replace('.pdf', '.jpg');
+    mediaHtml = `
+        <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
+            <img src="${imageUrl}" style="max-width: 100%; border: 1px solid var(--border-color); margin-bottom: 15px;" alt="PDF Preview">
+            <div>
+                <button onclick="loadPdfPages('${url}', '${pdfId}')" class="btn btn-secondary btn-small">View All Pages</button>
+            </div>
+            <div id="${pdfId}" style="margin-top: 15px; display: none;"></div>
+        </div>`;
+} else {
                 mediaHtml = `
                 <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
                 <canvas id="${pdfId}" style="max-width: 100%; border: 1px solid var(--border-color);"></canvas>
@@ -1735,21 +1748,36 @@
                     } else {
                     mediaHtml = `<video width="100%" height="315" controls><source src="${url}"></video>`;
                     }
-            } else if (url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
-                const pdfId = 'pdf-' + memory.id;
-                mediaHtml = `
-                <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
-                <canvas id="${pdfId}" style="max-width: 100%; border: 1px solid var(--border-color);"></canvas>
-                <div style="margin-top: 15px;">
-                <button onclick="renderPdfPage('${url}', '${pdfId}', 'prev')" class="btn btn-secondary btn-small">← Previous</button>
-                <span id="${pdfId}-info" style="margin: 0 15px; font-size: 14px;">Page 1</span>
-                <button onclick="renderPdfPage('${url}', '${pdfId}', 'next')" class="btn btn-secondary btn-small">Next →</button>
+            } else if (url.includes('.pdf') || url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
+    const pdfId = 'pdf-' + memory.id;
+    
+    // Check if PDF uploaded as image (can convert) or raw
+    if (url.includes('/image/upload/') && url.includes('.pdf')) {
+        // Convert PDF to image preview
+        const imageUrl = url.replace('/image/upload/', '/image/upload/f_jpg,pg_1/').replace('.pdf', '.jpg');
+        mediaHtml = `
+            <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
+                <img src="${imageUrl}" style="max-width: 100%; border: 1px solid var(--border-color); margin-bottom: 15px;" alt="PDF Preview">
+                <div>
+                    <button onclick="loadPdfPages('${url}', '${pdfId}')" class="btn btn-secondary btn-small">View All Pages</button>
                 </div>
-                <a href="${url}" target="_blank" style="display: inline-block; margin-top: 10px; font-size: 12px; color: var(--accent-color);">Open full PDF</a>
-                </div>`;
-                setTimeout(() => renderPdfPage(url, pdfId), 100);
-            }
-        }
+                <div id="${pdfId}" style="margin-top: 15px; display: none;"></div>
+            </div>`;
+    } else {
+        // Raw PDF - keep your canvas viewer
+        mediaHtml = `
+            <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
+            <canvas id="${pdfId}" style="max-width: 100%; border: 1px solid var(--border-color);"></canvas>
+            <div style="margin-top: 15px;">
+            <button onclick="renderPdfPage('${url}', '${pdfId}', 'prev')" class="btn btn-secondary btn-small">← Previous</button>
+            <span id="${pdfId}-info" style="margin: 0 15px; font-size: 14px;">Page 1</span>
+            <button onclick="renderPdfPage('${url}', '${pdfId}', 'next')" class="btn btn-secondary btn-small">Next →</button>
+            </div>
+            <a href="${url}" target="_blank" style="display: inline-block; margin-top: 10px; font-size: 12px; color: var(--accent-color);">Open full PDF</a>
+            </div>`;
+        setTimeout(() => renderPdfPage(url, pdfId), 100);
+    }
+}
         // Check for YouTube
         else if ((memory.Type === 'youtube' || memory.type === 'youtube')) {
             const youtubeUrl = memory.YouTube || memory.youtube;
