@@ -1519,7 +1519,7 @@
                 mediaHtml = `<img src="${url}" alt="${title}" class="memory-media">`;
             } else if (url.includes('/video/')) {
                 // Check if it's actually audio or video
-                if (memory.Type === 'voice' || memory.type === 'voice' || memory.Description?.includes('[Voice Note:')) {
+                if (memory.Type === 'voice' || memory.type === 'voice' || memory.Description?.includes('[Voice Note:') || url.match(/\.(mp3|wav|m4a|ogg|aac|flac)$/i)) {
                     mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${url}" type="audio/wav"></audio>`;
                 } else {
                     mediaHtml = `<video class="memory-video" controls><source src="${url}"></video>`;
@@ -1743,7 +1743,10 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
             if (url.includes('/image/')) {
                 mediaHtml = `<img src="${url}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
                 } else if (url.includes('/video/')) {
-                if (memory.Type === 'voice' || memory.type === 'voice' || memory.Description?.includes('[Voice Note:')) {
+                // Check if it's audio by file extension or type
+                if (memory.Type === 'voice' || memory.type === 'voice' || 
+                    memory.Description?.includes('[Voice Note:') ||
+                    url.match(/\.(mp3|wav|m4a|ogg|aac|flac)$/i)) {
                     mediaHtml = `<audio controls style="width: 100%;"><source src="${url}" type="audio/wav"></audio>`;
                     } else {
                     mediaHtml = `<video width="100%" height="315" controls><source src="${url}"></video>`;
