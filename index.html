@@ -1421,8 +1421,10 @@
                         resourceType = 'video';
                     } else if (file.type.startsWith('audio/')) {
                         resourceType = 'video'; // Cloudinary uses 'video' for audio
+                    } else if (file.type === 'application/pdf' || memoryData.type === 'document') {
+                        resourceType = 'raw'; // PDFs use raw upload
                     }
-                    
+
                     const uploadResult = await uploadToCloudinary(file, resourceType);
                     memoryData.cloudinaryUrl = uploadResult.url;
                     
