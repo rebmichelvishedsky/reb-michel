@@ -585,6 +585,7 @@
     </style>
     <script src="https://upload-widget.cloudinary.com/global/all.js" type="text/javascript"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
 </head>
 <body>
     <header>
@@ -1524,7 +1525,17 @@
                     mediaHtml = `<video class="memory-video" controls><source src="${url}"></video>`;
                 }
                 } else if (url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
-                mediaHtml = `<iframe src="${url}" class="memory-media" style="width: 100%; height: 400px; border: 1px solid var(--border-color);"></iframe>`;
+                const pdfId = 'pdf-' + memory.id;
+                mediaHtml = `
+                <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
+                <canvas id="${pdfId}" style="max-width: 100%; border: 1px solid var(--border-color);"></canvas>
+                <div style="margin-top: 15px;">
+                <button onclick="renderPdfPage('${url}', '${pdfId}', 'prev')" class="btn btn-secondary btn-small">← Previous</button>
+                <span id="${pdfId}-info" style="margin: 0 15px; font-size: 14px;">Page 1</span>
+                <button onclick="renderPdfPage('${url}', '${pdfId}', 'next')" class="btn btn-secondary btn-small">Next →</button>
+                </div>
+                <a href="${url}" target="_blank" style="display: inline-block; margin-top: 10px; font-size: 12px; color: var(--accent-color);">Open full PDF</a>
+                </div>`;
             }
         }
         // Check for YouTube
@@ -1724,13 +1735,20 @@
                     } else {
                     mediaHtml = `<video width="100%" height="315" controls><source src="${url}"></video>`;
                     }
-                } else if (url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
+            } else if (url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
+                const pdfId = 'pdf-' + memory.id;
                 mediaHtml = `
-                    <div style="padding: 40px; text-align: center; background: var(--secondary-color);">
-                    <p style="margin-bottom: 15px;">📄 Document</p>
-                    <a href="${url}" target="_blank" class="btn btn-primary">View Document</a>
-                    </div>`;
-         }
+                <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
+                <canvas id="${pdfId}" style="max-width: 100%; border: 1px solid var(--border-color);"></canvas>
+                <div style="margin-top: 15px;">
+                <button onclick="renderPdfPage('${url}', '${pdfId}', 'prev')" class="btn btn-secondary btn-small">← Previous</button>
+                <span id="${pdfId}-info" style="margin: 0 15px; font-size: 14px;">Page 1</span>
+                <button onclick="renderPdfPage('${url}', '${pdfId}', 'next')" class="btn btn-secondary btn-small">Next →</button>
+                </div>
+                <a href="${url}" target="_blank" style="display: inline-block; margin-top: 10px; font-size: 12px; color: var(--accent-color);">Open full PDF</a>
+                </div>`;
+                setTimeout(() => renderPdfPage(url, pdfId), 100);
+            }
         }
         // Check for YouTube
         else if ((memory.Type === 'youtube' || memory.type === 'youtube')) {
@@ -2102,6 +2120,45 @@
             }
         });
     }
+        let pdfDocs = {};
+let currentPages = {};
+
+async function renderPdfPage(url, canvasId, action = 'init') {
+    if (!pdfDocs[canvasId]) {
+        const loadingTask = pdfjsLib.getDocument(url);
+        pdfDocs[canvasId] = await loadingTask.promise;
+        currentPages[canvasId] = 1;
+    }
+    
+    const pdf = pdfDocs[canvasId];
+    let pageNum = currentPages[canvasId];
+    
+    if (action === 'next' && pageNum < pdf.numPages) pageNum++;
+    if (action === 'prev' && pageNum > 1) pageNum--;
+    
+    currentPages[canvasId] = pageNum;
+    
+    const page = await pdf.getPage(pageNum);
+    const canvas = document.getElementById(canvasId);
+    const context = canvas.getContext('2d');
+    const viewport = page.getViewport({ scale: 1.5 });
+    
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    
+    await page.render({ canvasContext: context, viewport: viewport }).promise;
+    
+    document.getElementById(canvasId + '-info').textContent = `Page ${pageNum} of ${pdf.numPages}`;
+}
+
+// Auto-render when modal opens
+document.getElementById('memory-modal').addEventListener('DOMContentLoaded', function() {
+    const canvases = document.querySelectorAll('canvas[id^="pdf-"]');
+    canvases.forEach(canvas => {
+        const url = canvas.dataset.url;
+        if (url) renderPdfPage(url, canvas.id);
+    });
+});
 </script>
 </body>
 </html>
