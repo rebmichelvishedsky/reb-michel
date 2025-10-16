@@ -1591,87 +1591,102 @@
     }
 
     async function submitVideoToTransferSh() {
-        if (!selectedVideoFile) {
-            showVideoAlert('Please select a video first', 'error');
-            return;
-        }
+    if (!selectedVideoFile) {
+        showVideoAlert('Please select a video first', 'error');
+        return;
+    }
 
-        const title = document.getElementById('video-title').value.trim();
-        if (!title) {
-            showVideoAlert('Please enter a video title', 'error');
-            return;
-        }
+    const title = document.getElementById('video-title').value.trim();
+    if (!title) {
+        showVideoAlert('Please enter a video title', 'error');
+        return;
+    }
 
-        const description = document.getElementById('video-description').value.trim();
-        const submitter = document.getElementById('video-submitter').value.trim() || 'Anonymous';
+    const description = document.getElementById('video-description').value.trim();
+    const submitter = document.getElementById('video-submitter').value.trim() || 'Anonymous';
 
-        const submitBtn = document.getElementById('submitVideoBtn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Uploading...';
+    const submitBtn = document.getElementById('submitVideoBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Uploading...';
 
-        document.getElementById('uploadProgress').style.display = 'block';
-        document.getElementById('videoMetadataForm').style.display = 'none';
+    document.getElementById('uploadProgress').style.display = 'block';
+    document.getElementById('videoMetadataForm').style.display = 'none';
 
-        try {
-            updateUploadStatus('Uploading to server...', 10);
+    try {
+        updateUploadStatus('Reading file...', 5);
 
-            const formData = new FormData();
-            formData.append('file', selectedVideoFile);
+        // Read file as base64
+        const reader = new FileReader();
+        reader.onload = async function(e) {
+            try {
+                const base64File = e.target.result.split(',')[1];
+                updateUploadStatus('Uploading to server...', 10);
 
-            const xhr = new XMLHttpRequest();
-            
-            xhr.upload.addEventListener('progress', (e) => {
-                if (e.lengthComputable) {
-                    const percentComplete = Math.round((e.loaded / e.total) * 80) + 10;
-                    updateUploadStatus(`Uploading video... ${percentComplete}%`, percentComplete);
+                // Send to your Vercel backend
+                const response = await fetch('/api/upload-transfersh', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        file: base64File,
+                        fileName: selectedVideoFile.name
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Backend upload failed');
                 }
-            });
 
-            xhr.addEventListener('load', async function() {
-                if (xhr.status === 200) {
-                    try {
-                        updateUploadStatus('Saving to database...', 95);
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.url) {
+                    updateUploadStatus('Saving to database...', 95);
 
-                        // Transfer.sh returns the download URL in the response
-                        const transferShUrl = xhr.responseText.trim();
+                    await saveVideoToAirtable({
+                        title: title,
+                        description: description,
+                        submitter: submitter,
+                        transferShUrl: data.url,
+                        fileName: selectedVideoFile.name,
+                        fileSize: (selectedVideoFile.size / (1024 * 1024)).toFixed(2) + ' MB'
+                    });
 
-                        await saveVideoToAirtable({
-                            title: title,
-                            description: description,
-                            submitter: submitter,
-                            transferShUrl: transferShUrl,
-                            fileName: selectedVideoFile.name,
-                            fileSize: (selectedVideoFile.size / (1024 * 1024)).toFixed(2) + ' MB'
-                        });
-
-                        updateUploadStatus('Upload complete!', 100);
-                        showVideoAlert('Video uploaded successfully! It will be reviewed and added to the site soon.', 'success');
-
-                        setTimeout(resetVideoUpload, 3000);
-                    } catch (error) {
-                        throw new Error('Failed to save to database: ' + error.message);
-                    }
+                    updateUploadStatus('Upload complete!', 100);
+                    showVideoAlert('Video uploaded successfully! It will be reviewed and added to the site soon.', 'success');
+                    setTimeout(resetVideoUpload, 3000);
                 } else {
-                    throw new Error('Upload failed with status: ' + xhr.status);
+                    throw new Error('Invalid response from server');
                 }
-            });
+            } catch (error) {
+                console.error('Upload error:', error);
+                showVideoAlert('Upload failed: ' + error.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Video';
+                document.getElementById('uploadProgress').style.display = 'none';
+                document.getElementById('videoMetadataForm').style.display = 'block';
+            }
+        };
 
-            xhr.addEventListener('error', function() {
-                throw new Error('Network error during upload');
-            });
-
-            xhr.open('PUT', `${TRANSFER_SH_URL}/${selectedVideoFile.name}`);
-            xhr.send(selectedVideoFile);
-
-        } catch (error) {
-            console.error('Upload error:', error);
-            showVideoAlert('Upload failed: ' + error.message, 'error');
+        reader.onerror = function() {
+            showVideoAlert('Failed to read file', 'error');
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Video';
             document.getElementById('uploadProgress').style.display = 'none';
             document.getElementById('videoMetadataForm').style.display = 'block';
-        }
+        };
+
+        reader.readAsDataURL(selectedVideoFile);
+
+    } catch (error) {
+        console.error('Error:', error);
+        showVideoAlert('Error: ' + error.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Video';
+        document.getElementById('uploadProgress').style.display = 'none';
+        document.getElementById('videoMetadataForm').style.display = 'block';
     }
+}
 
     async function saveVideoToAirtable(videoData) {
         try {
