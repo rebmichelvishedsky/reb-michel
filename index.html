@@ -2281,7 +2281,7 @@
 
         try {
             updateUploadStatus('Preparing upload...', 5);
-            const serverResponse = await fetch('/api/upload-video', { method: 'POST' });
+            const configResponse = await fetch('/api/upload-video', { method: 'POST' });
             const configData = await configResponse.json();
             
             if (configData.status !== 'ok') {
