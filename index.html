@@ -2280,19 +2280,21 @@
         document.getElementById('videoMetadataForm').style.display = 'none';
 
         try {
-            updateUploadStatus('Getting upload server...', 5);
+            updateUploadStatus('Preparing upload...', 5);
             const serverResponse = await fetch('/api/upload-video', { method: 'POST' });
-            const serverData = await serverResponse.json();
+            const configData = await configResponse.json();
             
-            if (serverData.status !== 'ok') {
-                throw new Error('Failed to get upload server');
+            if (configData.status !== 'ok') {
+                throw new Error('Failed to prepare upload: ' + (configData.error || 'Unknown error'));
             }
 
-            const uploadUrl = serverData.uploadUrl;
+            const { token, folderId, uploadUrl } = configData;
             updateUploadStatus('Uploading to server...', 10);
 
             const formData = new FormData();
             formData.append('file', selectedVideoFile);
+            formData.append('token', token);
+            formData.append('folderId', folderId);
 
             const xhr = new XMLHttpRequest();
             
@@ -2305,28 +2307,32 @@
 
             xhr.addEventListener('load', async function() {
                 if (xhr.status === 200) {
-                    const uploadData = JSON.parse(xhr.responseText);
-                    
-                    if (uploadData.status === 'ok') {
-                        updateUploadStatus('Saving to database...', 95);
-                        
-                        const gofileUrl = uploadData.data.downloadPage;
-                        
-                        await saveVideoToAirtable({
-                            title: title,
-                            description: description,
-                            submitter: submitter,
-                            gofileUrl: gofileUrl,
-                            fileName: selectedVideoFile.name,
-                            fileSize: (selectedVideoFile.size / (1024 * 1024)).toFixed(2) + ' MB'
-                        });
+                    try {
+                        const uploadData = JSON.parse(xhr.responseText);
 
-                        updateUploadStatus('Upload complete!', 100);
-                        showVideoAlert('Video uploaded successfully! It will be reviewed and added to the site soon.', 'success');
-                        
-                        setTimeout(resetVideoUpload, 3000);
-                    } else {
-                        throw new Error('Upload failed: ' + (uploadData.message || 'Unknown error'));
+                        if (uploadData.status === 'ok' && uploadData.data) {
+                            updateUploadStatus('Saving to database...', 95);
+                            const fileData = uploadData.data;
+                            const downloadLink = fileData.directLink || fileData.downloadPage || `https://gofile.io/d/${fileData.code}`;
+
+                            await saveVideoToAirtable({
+                                title: title,
+                                description: description,
+                                submitter: submitter,
+                                gofileUrl: downloadLink,
+                                fileName: selectedVideoFile.name,
+                                fileSize: (selectedVideoFile.size / (1024 * 1024)).toFixed(2) + ' MB'
+                            });
+
+                            updateUploadStatus('Upload complete!', 100);
+                            showVideoAlert('Video uploaded successfully! It will be reviewed and added to the site soon.', 'success');
+
+                            setTimeout(resetVideoUpload, 3000);
+                        } else {
+                            throw new Error('Upload failed: ' + (uploadData.status || 'Unknown error'));
+                        }
+                    } catch (parseError) {
+                        throw new Error('Invalid upload response: ' + parseError.message);
                     }
                 } else {
                     throw new Error('Upload failed with status: ' + xhr.status);
