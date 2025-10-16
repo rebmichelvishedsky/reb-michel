@@ -4,21 +4,36 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Step 1: Get GoFile server
-    const serverResponse = await fetch('https://api.gofile.io/getServer');
+    // Get GoFile server with better error handling
+    const serverResponse = await fetch('https://api.gofile.io/getServer', {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0'
+      }
+    });
+
+    if (!serverResponse.ok) {
+      console.error('GoFile API error:', serverResponse.status, serverResponse.statusText);
+      return res.status(400).json({ 
+        error: `GoFile API error: ${serverResponse.status}`,
+        details: serverResponse.statusText
+      });
+    }
+
     const serverData = await serverResponse.json();
+    
+    console.log('GoFile response:', serverData);
 
     if (serverData.status !== 'ok') {
-      return res.status(400).json({ error: 'Failed to get upload server' });
+      console.error('GoFile status not ok:', serverData);
+      return res.status(400).json({ 
+        error: 'GoFile returned error',
+        details: serverData
+      });
     }
 
     const server = serverData.data.server;
 
-    // Step 2: The request body contains the file (from frontend)
-    // For this to work, we need to handle the multipart form data
-    // Vercel's default body parser doesn't handle file uploads well
-    // So we'll return the server info and let frontend handle the upload
-    
     return res.status(200).json({
       status: 'ok',
       server: server,
@@ -26,7 +41,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error('Error:', error);
-    return res.status(500).json({ error: error.message });
+    console.error('Backend error:', error);
+    return res.status(500).json({ 
+      error: error.message,
+      type: error.name
+    });
   }
 }
