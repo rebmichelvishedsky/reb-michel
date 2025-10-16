@@ -305,7 +305,7 @@
         /* Memory Grid */
         .memories-grid {
             display: grid;
-             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 30px;
             margin-bottom: 40px;
             align-items: start;
@@ -508,6 +508,81 @@
             overflow: auto;
         }
 
+        /* Video Upload Section */
+        .video-upload-section {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .drop-zone {
+            border: 3px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            background: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--accent-color);
+            background: var(--secondary-color);
+        }
+
+        .drop-zone-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+        }
+
+        .drop-zone-text {
+            font-size: 18px;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .drop-zone-subtext {
+            font-size: 14px;
+            color: var(--accent-color);
+        }
+
+        .upload-progress {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: var(--secondary-color);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        .upload-status {
+            text-align: center;
+            color: var(--accent-color);
+            font-size: 14px;
+        }
+
         /* Footer */
         footer {
             background: white;
@@ -611,6 +686,7 @@
                 <a href="#" class="nav-item active" onclick="showSection('home')" id="nav-home">Home</a>
                 <a href="#" class="nav-item" onclick="showSection('memories')" id="nav-memories">Memories</a>
                 <a href="#" class="nav-item" onclick="showSection('share')" id="nav-share">Share Memory</a>
+                <a href="#" class="nav-item" onclick="showSection('uploadvideo')" id="nav-uploadvideo">Upload Video</a>
                 <a href="#" class="nav-item" onclick="showSection('album')" id="nav-album">Photo Album</a>
                 <a href="#" class="nav-item" onclick="showSection('about')" id="nav-about">About</a>
             </div>
@@ -781,10 +857,10 @@
                         <div class="form-group" id="voice-group" style="display: none;">
                             <label id="voice-label">Record Voice Note</label>
                             <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
-                                <button type="button" class="btn btn-primary" id="start-record">🎤 Start</button>
-                                <button type="button" class="btn btn-secondary" id="pause-record" disabled>⏸️ Pause</button>
-                                <button type="button" class="btn btn-danger" id="stop-record" disabled>⏹️ Stop</button>
-                                <button type="button" class="btn btn-secondary" id="play-record" disabled>▶️ Play</button>
+                                <button type="button" class="btn btn-primary" id="start-record">Start</button>
+                                <button type="button" class="btn btn-secondary" id="pause-record" disabled>Pause</button>
+                                <button type="button" class="btn btn-danger" id="stop-record" disabled>Stop</button>
+                                <button type="button" class="btn btn-secondary" id="play-record" disabled>Play</button>
                                 <span id="record-time">0:00</span>
                             </div>
                             <audio id="recorded-audio" controls style="width: 100%; display: none;"></audio>
@@ -798,6 +874,57 @@
 
                         <button type="submit" class="btn btn-primary" id="submit-btn">Share Memory</button>
                     </form>
+                </div>
+            </div>
+
+            <!-- Upload Video Section -->
+            <div id="uploadvideo-section" class="section" style="display: none;">
+                <div class="video-upload-section">
+                    <h2 id="uploadvideo-title" style="text-align: center; margin-bottom: 15px;">Upload Video Memory</h2>
+                    <p id="uploadvideo-subtitle" style="text-align: center; color: var(--accent-color); margin-bottom: 40px;">
+                        Share longer videos (any size) with us. Your video will be reviewed before appearing on the site.
+                    </p>
+
+                    <div id="upload-alert"></div>
+
+                    <!-- Drop Zone -->
+                    <div class="drop-zone" id="videoDropZone">
+                        <div class="drop-zone-icon">🎬</div>
+                        <div class="drop-zone-text" id="drop-text">Drag video here or click to select</div>
+                        <div class="drop-zone-subtext" id="drop-subtext">Any video size accepted • MP4, MOV, AVI, etc.</div>
+                        <input type="file" id="videoFileInput" accept="video/*" style="display: none;">
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill">0%</div>
+                        </div>
+                        <div class="upload-status" id="uploadStatus">Preparing upload...</div>
+                    </div>
+
+                    <!-- Metadata Form -->
+                    <div id="videoMetadataForm" style="display: none;">
+                        <div class="form-group">
+                            <label for="video-title" id="video-title-label">Video Title *</label>
+                            <input type="text" id="video-title" placeholder="e.g., Birthday celebration 2020" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="video-description" id="video-description-label">Description</label>
+                            <textarea id="video-description" placeholder="Tell us about this video..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="video-submitter" id="video-submitter-label">Your Name (Optional)</label>
+                            <input type="text" id="video-submitter" placeholder="Anonymous">
+                        </div>
+
+                        <div style="display: flex; gap: 15px; margin-top: 30px;">
+                            <button class="btn btn-primary" id="submitVideoBtn" style="flex: 1;">Submit Video</button>
+                            <button class="btn btn-secondary" id="cancelVideoBtn">Cancel</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -828,7 +955,7 @@
                     <p style="margin-top: 25px; font-size: 14px; color: var(--accent-color);">
                         Family members can add photos directly in Google Photos
                     </p>
-                        </div>
+                </div>
             </div>
         </div>
     </div>
@@ -893,7 +1020,7 @@
     // ============================================
     const CLOUDINARY_CONFIG = {
         cloudName: 'deiauee2m', 
-        uploadPreset: 'memorial_uploads', // Must match the preset you created
+        uploadPreset: 'memorial_uploads',
     };
 
     // ============================================
@@ -907,7 +1034,7 @@
 
     const VIDEO_UPLOAD_URL = 'https://reb-michel-video.onrender.com/upload';
 
-    // Language system (keeping your existing translations)
+    // Language system
     const translations = {
         en: {
             'main-title': 'In Memory of Reb Michel Vishedsky ע"ה',
@@ -915,7 +1042,9 @@
             'nav-home': 'Home',
             'nav-memories': 'Memories',
             'nav-share': 'Share Memory',
+            'nav-uploadvideo': 'Upload Video',
             'nav-about': 'About',
+            'nav-album': 'Photo Album',
             'welcome-title': 'In loving memory of Reb Michel Vishedsky ע"ה',
             'welcome-text': 'A place to share and preserve cherished memories, stories, and moments that celebrate his life and legacy.',
             'memories-title': 'All Memories',
@@ -928,7 +1057,6 @@
             'youtube-label': 'YouTube URL',
             'name-label': 'Your Name (Optional)',
             'email-label': 'Your Email (Optional)',
-            'nav-album': 'Photo Album',
             'album-title': 'Family Photo Album',
             'album-description': 'A collection of cherished photos and videos from family and friends.',
             'submit-btn': 'Share Memory',
@@ -937,7 +1065,12 @@
             'about-content-p2': 'Here, family, friends, and all those whose lives he touched can share photos, videos, stories, and memories that celebrate his life, teachings, and the impact he had, and continues to have, on all of us.',
             'about-content-p3': 'Every memory shared here contributes to keeping his legacy alive for future generations.',
             'footer-text': 'In loving memory of Reb Michel Vishedsky ע"ה',
-            'contact-text': 'Contact: rebmichelvishedsky@gmail.com'
+            'contact-text': 'Contact: rebmichelvishedsky@gmail.com',
+            'uploadvideo-title': 'Upload Video Memory',
+            'uploadvideo-subtitle': 'Share longer videos (any size) with us. Your video will be reviewed before appearing on the site.',
+            'video-title-label': 'Video Title *',
+            'video-description-label': 'Description',
+            'video-submitter-label': 'Your Name (Optional)',
         },
         he: {
             'main-title': 'לזכר הרב מיכל וישצקי ע"ה',
@@ -945,7 +1078,9 @@
             'nav-home': 'בית',
             'nav-memories': 'זכרונות',
             'nav-share': 'שתף זכרון',
+            'nav-uploadvideo': 'העלה וידאו',
             'nav-about': 'אודות',
+            'nav-album': 'אלבום תמונות',
             'welcome-title': 'לזכר הרב מיכל וישצקי ע"ה',
             'welcome-text': 'מקום לשתף ולשמר זכרונות יקרים, סיפורים ורגעים שחוגגים את חייו ומורשתו.',
             'memories-title': 'כל הזכרונות',
@@ -958,7 +1093,6 @@
             'youtube-label': 'קישור יוטיוב',
             'name-label': 'שמך (אופציונלי)',
             'email-label': 'האימייל שלך (אופציונלי)',
-            'nav-album': 'אלבום תמונות',
             'album-title': 'אלבום תמונות משפחתי',
             'album-description': 'אוסף של תמונות וסרטונים יקרים ממשפחה וחברים.',
             'submit-btn': 'שתף זכרון',
@@ -967,7 +1101,12 @@
             'about-content-p2': 'כאן, משפחה, חברים, וכל אלה שחייהם הושפעו ממנו יכולים לחלוק תמונות, סרטונים, סיפורים וזיכרונות החוגגים את חייו, תורתו, והשפעתו על קהילתנו.',
             'about-content-p3': 'כל זיכרון המשותף כאן תורם לשמירת מורשתו חיה לדורות הבאים.',
             'footer-text': 'לזכר הרב מיכל וישצקי ע"ה',
-            'contact-text': 'יצירת קשר: rebmichelvishedsky@gmail.com'
+            'contact-text': 'יצירת קשר: rebmichelvishedsky@gmail.com',
+            'uploadvideo-title': 'העלה זיכרון וידאו',
+            'uploadvideo-subtitle': 'שתף סרטונים ארוכים יותר (כל גודל) איתנו. הסרטון שלך ייבדק לפני שיופיע באתר.',
+            'video-title-label': 'כותרת וידאו *',
+            'video-description-label': 'תיאור',
+            'video-submitter-label': 'שמך (אופציונלי)',
         }
     };
 
@@ -982,6 +1121,7 @@
     let recordingTimer = null;
     let recordingSeconds = 0;
     let isPaused = false;
+    let selectedVideoFile = null;
 
     // ============================================
     // CLOUDINARY UPLOAD FUNCTION
@@ -993,7 +1133,7 @@
             formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
             formData.append('folder', 'memorial_site');
 
-           const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/${resourceType}/upload`;
+            const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/${resourceType}/upload`;
             
             fetch(uploadUrl, {
                 method: 'POST',
@@ -1085,14 +1225,14 @@
             );
 
             if (response.ok) {
-                showConfigStatus('✅ Database connection successful!', 'success');
+                showConfigStatus('Database connection successful!', 'success');
                 await fetchMemoriesFromAirtable();
                 refreshCurrentView();
             } else {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
         } catch (error) {
-            showConfigStatus(`❌ Connection failed: ${error.message}`, 'error');
+            showConfigStatus(`Connection failed: ${error.message}`, 'error');
         }
     }
 
@@ -1378,7 +1518,6 @@
 
             const fileInput = document.getElementById('memory-file');
 
-            // Handle YouTube
             if (memoryData.type === 'youtube' && memoryData.youtube) {
                 const newMemory = await saveMemoryToAirtable(memoryData);
                 memories.unshift(newMemory);
@@ -1386,13 +1525,12 @@
                 resetForm();
                 refreshCurrentView();
                 
-            // Handle Voice Recording
             } else if (memoryData.type === 'voice' && recordedBlob) {
                 submitBtn.textContent = 'Uploading audio...';
                 
                 try {
                     const audioFile = new File([recordedBlob], `voice_${Date.now()}.wav`, { type: 'audio/wav' });
-                    const uploadResult = await uploadToCloudinary(audioFile, 'video'); // Cloudinary uses 'video' for audio
+                    const uploadResult = await uploadToCloudinary(audioFile, 'video');
                     
                     memoryData.cloudinaryUrl = uploadResult.url;
                     memoryData.description += `\n\n[Voice Note: ${Math.floor(recordingSeconds/60)}:${(recordingSeconds%60).toString().padStart(2,'0')} duration]`;
@@ -1407,22 +1545,20 @@
                     throw new Error('Failed to upload audio: ' + error.message);
                 }
                 
-            // Handle File Uploads (Images, Videos, Documents)
             } else if (fileInput.files[0] && memoryData.type !== 'youtube') {
                 const file = fileInput.files[0];
                 submitBtn.textContent = 'Uploading file...';
                 
                 try {
-                    // Determine resource type
                     let resourceType = 'auto';
                     if (file.type.startsWith('image/')) {
                         resourceType = 'image';
                     } else if (file.type.startsWith('video/')) {
                         resourceType = 'video';
                     } else if (file.type.startsWith('audio/')) {
-                        resourceType = 'video'; // Cloudinary uses 'video' for audio
+                        resourceType = 'video';
                     } else if (file.type === 'application/pdf' || memoryData.type === 'document') {
-                        resourceType = 'raw'; // PDFs use raw upload
+                        resourceType = 'raw';
                     }
 
                     const uploadResult = await uploadToCloudinary(file, resourceType);
@@ -1438,7 +1574,6 @@
                     throw new Error('Failed to upload file: ' + error.message);
                 }
                 
-            // Handle Story-only submissions
             } else {
                 const newMemory = await saveMemoryToAirtable(memoryData);
                 memories.unshift(newMemory);
@@ -1464,7 +1599,6 @@
         document.getElementById('youtube-group').style.display = 'none';
         document.getElementById('voice-group').style.display = 'none';
         
-        // Reset voice recording
         recordedBlob = null;
         recordingSeconds = 0;
         document.getElementById('record-time').textContent = '0:00';
@@ -1512,47 +1646,29 @@
         
         let mediaHtml = '';
         
-        // Check for Cloudinary URL first
         if (memory.CloudinaryURL) {
             const url = memory.CloudinaryURL;
             if (url.includes('/image/')) {
                 mediaHtml = `<img src="${url}" alt="${title}" class="memory-media">`;
             } else if (url.includes('/video/')) {
-                // Check if it's actually audio or video
                 if (memory.Type === 'voice' || memory.type === 'voice' || memory.Description?.includes('[Voice Note:') || url.match(/\.(mp3|wav|m4a|ogg|aac|flac)$/i)) {
                     mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${url}" type="audio/wav"></audio>`;
                 } else {
                     mediaHtml = `<video class="memory-video" controls><source src="${url}"></video>`;
                 }
-                } else if (url.includes('.pdf') || url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
+            } else if (url.includes('.pdf') || url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
                 const pdfId = 'pdf-' + memory.id;
-// Check if PDF was uploaded as image type (can be converted) or raw (needs download)
-if (url.includes('/image/upload/') && url.includes('.pdf')) {
-    const imageUrl = url.replace('/image/upload/', '/image/upload/f_jpg,pg_1/').replace('.pdf', '.jpg');
-    mediaHtml = `
-        <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
-            <img src="${imageUrl}" style="max-width: 100%; border: 1px solid var(--border-color); margin-bottom: 15px;" alt="PDF Preview">
-            <div>
-                <button onclick="loadPdfPages('${url}', '${pdfId}')" class="btn btn-secondary btn-small">View All Pages</button>
-            </div>
-            <div id="${pdfId}" style="margin-top: 15px; display: none;"></div>
-        </div>`;
-} else {
-                mediaHtml = `
-                <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
-                <canvas id="${pdfId}" style="max-width: 100%; border: 1px solid var(--border-color);"></canvas>
-                <div style="margin-top: 15px;">
-                <button onclick="renderPdfPage('${url}', '${pdfId}', 'prev')" class="btn btn-secondary btn-small">← Previous</button>
-                <span id="${pdfId}-info" style="margin: 0 15px; font-size: 14px;">Page 1</span>
-                <button onclick="renderPdfPage('${url}', '${pdfId}', 'next')" class="btn btn-secondary btn-small">Next →</button>
-                </div>
-                <a href="${url}" target="_blank" style="display: inline-block; margin-top: 10px; font-size: 12px; color: var(--accent-color);">Open full PDF</a>
-                </div>`;
+                if (url.includes('/image/upload/') && url.includes('.pdf')) {
+                    const imageUrl = url.replace('/image/upload/', '/image/upload/f_jpg,pg_1/').replace('.pdf', '.jpg');
+                    mediaHtml = `
+                        <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
+                            <img src="${imageUrl}" style="max-width: 100%; border: 1px solid var(--border-color); margin-bottom: 15px;" alt="PDF Preview">
+                        </div>`;
+                } else {
+                    mediaHtml = `<div style="background: var(--secondary-color); padding: 20px; text-align: center;"><p>PDF Document</p></div>`;
+                }
             }
-        }
-        }
-        // Check for YouTube
-        else if (memory.Type === 'youtube' || memory.type === 'youtube') {
+        } else if (memory.Type === 'youtube' || memory.type === 'youtube') {
             const youtubeUrl = memory.YouTube || memory.youtube;
             console.log('YouTube URL found:', youtubeUrl);
             
@@ -1564,9 +1680,7 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
                     mediaHtml = `<iframe class="memory-video" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
                 }
             }
-        }
-        // Fallback to old FileData method (for backward compatibility)
-        else if (memory.FileData && memory.FileType) {
+        } else if (memory.FileData && memory.FileType) {
             if (memory.FileType.startsWith('image/')) {
                 mediaHtml = `<img src="${memory.FileData}" alt="${title}" class="memory-media">`;
             } else if (memory.FileType.startsWith('video/')) {
@@ -1574,9 +1688,7 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
             } else if (memory.FileType.startsWith('audio/')) {
                 mediaHtml = `<audio class="memory-media" controls style="width: 100%; height: 60px; background: var(--secondary-color);"><source src="${memory.FileData}" type="${memory.FileType}"></audio>`;
             }
-        }
-        // Check Airtable attachments
-        else if (memory.Attachment && memory.Attachment.length > 0) {
+        } else if (memory.Attachment && memory.Attachment.length > 0) {
             const attachment = memory.Attachment[0];
             if (attachment.type && attachment.type.startsWith('image/')) {
                 mediaHtml = `<img src="${attachment.url}" alt="${title}" class="memory-media">`;
@@ -1737,53 +1849,20 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
         
         let mediaHtml = '';
         
-        // Check for Cloudinary URL first
         if (memory.CloudinaryURL) {
             const url = memory.CloudinaryURL;
             if (url.includes('/image/')) {
                 mediaHtml = `<img src="${url}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
-                } else if (url.includes('/video/')) {
-                // Check if it's audio by file extension or type
+            } else if (url.includes('/video/')) {
                 if (memory.Type === 'voice' || memory.type === 'voice' || 
                     memory.Description?.includes('[Voice Note:') ||
                     url.match(/\.(mp3|wav|m4a|ogg|aac|flac)$/i)) {
                     mediaHtml = `<audio controls style="width: 100%;"><source src="${url}" type="audio/wav"></audio>`;
-                    } else {
+                } else {
                     mediaHtml = `<video width="100%" height="315" controls><source src="${url}"></video>`;
-                    }
-             } else if (url.includes('.pdf') || url.includes('/raw/') || memory.Type === 'document' || memory.type === 'document') {
-                const pdfId = 'pdf-' + memory.id;
-    
-                // Check if PDF uploaded as image (can convert) or raw
-                if (url.includes('/image/upload/') && url.includes('.pdf')) {
-                    // Convert PDF to image preview
-                    const imageUrl = url.replace('/image/upload/', '/image/upload/f_jpg,pg_1/').replace('.pdf', '.jpg');
-                    mediaHtml = `
-            <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
-                <img src="${imageUrl}" style="max-width: 100%; border: 1px solid var(--border-color); margin-bottom: 15px;" alt="PDF Preview">
-                <div>
-                    <button onclick="loadPdfPages('${url}', '${pdfId}')" class="btn btn-secondary btn-small">View All Pages</button>
-                </div>
-                <div id="${pdfId}" style="margin-top: 15px; display: none;"></div>
-            </div>`;
-    } else {
-        // Raw PDF - keep your canvas viewer
-        mediaHtml = `
-            <div style="background: var(--secondary-color); padding: 20px; text-align: center;">
-            <canvas id="${pdfId}" style="max-width: 100%; border: 1px solid var(--border-color);"></canvas>
-            <div style="margin-top: 15px;">
-            <button onclick="renderPdfPage('${url}', '${pdfId}', 'prev')" class="btn btn-secondary btn-small">← Previous</button>
-            <span id="${pdfId}-info" style="margin: 0 15px; font-size: 14px;">Page 1</span>
-            <button onclick="renderPdfPage('${url}', '${pdfId}', 'next')" class="btn btn-secondary btn-small">Next →</button>
-            </div>
-            <a href="${url}" target="_blank" style="display: inline-block; margin-top: 10px; font-size: 12px; color: var(--accent-color);">Open full PDF</a>
-            </div>`;
-        setTimeout(() => renderPdfPage(url, pdfId), 100);
-    }
-}
-        }
-        // Check for YouTube
-        else if ((memory.Type === 'youtube' || memory.type === 'youtube')) {
+                }
+            }
+        } else if ((memory.Type === 'youtube' || memory.type === 'youtube')) {
             const youtubeUrl = memory.YouTube || memory.youtube;
             console.log('Modal YouTube URL:', youtubeUrl);
             
@@ -1795,9 +1874,7 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
                     mediaHtml = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
                 }
             }
-        }
-        // Fallback to old methods
-        else if (memory.FileData && memory.FileType) {
+        } else if (memory.FileData && memory.FileType) {
             if (memory.FileType.startsWith('image/')) {
                 mediaHtml = `<img src="${memory.FileData}" alt="${title}" style="width: 100%; max-height: 400px; object-fit: contain;">`;
             } else if (memory.FileType.startsWith('video/')) {
@@ -2029,16 +2106,16 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
                 mediaRecorder = new MediaRecorder(stream);
         
                 mediaRecorder.ondataavailable = function(event) {
-                     audioChunks.push(event.data);
+                    audioChunks.push(event.data);
                 };
         
                 mediaRecorder.onstop = function() {
-                     recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                     const audioUrl = URL.createObjectURL(recordedBlob);
-                     audioElement.src = audioUrl;
-                     audioElement.style.display = 'block';
+                    recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(recordedBlob);
+                    audioElement.src = audioUrl;
+                    audioElement.style.display = 'block';
             
-                     stream.getTracks().forEach(track => track.stop());
+                    stream.getTracks().forEach(track => track.stop());
                 };
         
                 mediaRecorder.start();
@@ -2049,10 +2126,10 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
                 statusText.textContent = 'Recording...';
         
                 recordingTimer = setInterval(() => {
-                     recordingSeconds++;
-                     const minutes = Math.floor(recordingSeconds / 60);
-                     const seconds = recordingSeconds % 60;
-                     timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    recordingSeconds++;
+                    const minutes = Math.floor(recordingSeconds / 60);
+                    const seconds = recordingSeconds % 60;
+                    timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
                 }, 1000);
         
             } catch (error) {
@@ -2064,13 +2141,13 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
             if (mediaRecorder && !isPaused) {
                 mediaRecorder.pause();
                 isPaused = true;
-                pauseBtn.textContent = '▶️ Resume';
+                pauseBtn.textContent = 'Resume';
                 statusText.textContent = 'Recording paused';
                 clearInterval(recordingTimer);
             } else if (mediaRecorder && isPaused) {
                 mediaRecorder.resume();
                 isPaused = false;
-                pauseBtn.textContent = '⏸️ Pause';
+                pauseBtn.textContent = 'Pause';
                 statusText.textContent = 'Recording...';
                 recordingTimer = setInterval(() => {
                     recordingSeconds++;
@@ -2092,7 +2169,7 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
                 playBtn.disabled = false;
                 statusText.textContent = 'Recording complete. Click Play to review.';
                 isPaused = false;
-                pauseBtn.textContent = '⏸️ Pause';
+                pauseBtn.textContent = 'Pause';
             }
         });
 
@@ -2101,6 +2178,233 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
                 audioElement.play();
             }
         });
+    }
+
+    // ============================================
+    // GOFILE VIDEO UPLOAD SYSTEM
+    // ============================================
+
+    function initializeVideoUpload() {
+        const dropZone = document.getElementById('videoDropZone');
+        const fileInput = document.getElementById('videoFileInput');
+        const cancelBtn = document.getElementById('cancelVideoBtn');
+        const submitBtn = document.getElementById('submitVideoBtn');
+
+        if (!dropZone || !fileInput) return;
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('video/')) {
+                handleVideoSelection(file);
+            } else {
+                showVideoAlert('Please select a video file', 'error');
+            }
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleVideoSelection(file);
+            }
+        });
+
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', resetVideoUpload);
+        }
+
+        if (submitBtn) {
+            submitBtn.addEventListener('click', submitVideoToGoFile);
+        }
+    }
+
+    function handleVideoSelection(file) {
+        selectedVideoFile = file;
+        const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+        
+        document.getElementById('drop-text').textContent = file.name;
+        document.getElementById('drop-subtext').textContent = `Size: ${fileSizeMB} MB`;
+        
+        document.getElementById('videoMetadataForm').style.display = 'block';
+        
+        showVideoAlert(`Video selected: ${file.name} (${fileSizeMB} MB)`, 'success');
+    }
+
+    function resetVideoUpload() {
+        selectedVideoFile = null;
+        document.getElementById('videoFileInput').value = '';
+        document.getElementById('video-title').value = '';
+        document.getElementById('video-description').value = '';
+        document.getElementById('video-submitter').value = '';
+        document.getElementById('videoMetadataForm').style.display = 'none';
+        document.getElementById('uploadProgress').style.display = 'none';
+        document.getElementById('drop-text').textContent = 'Drag video here or click to select';
+        document.getElementById('drop-subtext').textContent = 'Any video size accepted • MP4, MOV, AVI, etc.';
+        document.getElementById('upload-alert').innerHTML = '';
+    }
+
+    async function submitVideoToGoFile() {
+        if (!selectedVideoFile) {
+            showVideoAlert('Please select a video first', 'error');
+            return;
+        }
+
+        const title = document.getElementById('video-title').value.trim();
+        if (!title) {
+            showVideoAlert('Please enter a video title', 'error');
+            return;
+        }
+
+        const description = document.getElementById('video-description').value.trim();
+        const submitter = document.getElementById('video-submitter').value.trim() || 'Anonymous';
+
+        const submitBtn = document.getElementById('submitVideoBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading...';
+
+        document.getElementById('uploadProgress').style.display = 'block';
+        document.getElementById('videoMetadataForm').style.display = 'none';
+
+        try {
+            updateUploadStatus('Getting upload server...', 5);
+            const serverResponse = await fetch('https://api.gofile.io/getServer');
+            const serverData = await serverResponse.json();
+            
+            if (serverData.status !== 'ok') {
+                throw new Error('Failed to get upload server');
+            }
+
+            const server = serverData.data.server;
+            updateUploadStatus('Uploading to server...', 10);
+
+            const formData = new FormData();
+            formData.append('file', selectedVideoFile);
+
+            const xhr = new XMLHttpRequest();
+            
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable) {
+                    const percentComplete = Math.round((e.loaded / e.total) * 80) + 10;
+                    updateUploadStatus(`Uploading video... ${percentComplete}%`, percentComplete);
+                }
+            });
+
+            xhr.addEventListener('load', async function() {
+                if (xhr.status === 200) {
+                    const uploadData = JSON.parse(xhr.responseText);
+                    
+                    if (uploadData.status === 'ok') {
+                        updateUploadStatus('Saving to database...', 95);
+                        
+                        const gofileUrl = uploadData.data.downloadPage;
+                        
+                        await saveVideoToAirtable({
+                            title: title,
+                            description: description,
+                            submitter: submitter,
+                            gofileUrl: gofileUrl,
+                            fileName: selectedVideoFile.name,
+                            fileSize: (selectedVideoFile.size / (1024 * 1024)).toFixed(2) + ' MB'
+                        });
+
+                        updateUploadStatus('Upload complete!', 100);
+                        showVideoAlert('Video uploaded successfully! It will be reviewed and added to the site soon.', 'success');
+                        
+                        setTimeout(resetVideoUpload, 3000);
+                    } else {
+                        throw new Error('Upload failed: ' + (uploadData.message || 'Unknown error'));
+                    }
+                } else {
+                    throw new Error('Upload failed with status: ' + xhr.status);
+                }
+            });
+
+            xhr.addEventListener('error', function() {
+                throw new Error('Network error during upload');
+            });
+
+            xhr.open('POST', `https://${server}.gofile.io/uploadFile`);
+            xhr.send(formData);
+
+        } catch (error) {
+            console.error('Upload error:', error);
+            showVideoAlert('Upload failed: ' + error.message, 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Video';
+            document.getElementById('uploadProgress').style.display = 'none';
+            document.getElementById('videoMetadataForm').style.display = 'block';
+        }
+    }
+
+    async function saveVideoToAirtable(videoData) {
+        try {
+            const payload = {
+                fields: {
+                    Title: videoData.title,
+                    Description: videoData.description || '',
+                    Submitter: videoData.submitter,
+                    Type: 'video',
+                    GoFileURL: videoData.gofileUrl,
+                    Status: 'Pending Review'
+                }
+            };
+
+            const response = await fetch(
+                `https://api.airtable.com/v0/${AIRTABLE_CONFIG.baseId}/${AIRTABLE_CONFIG.tableName}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${AIRTABLE_CONFIG.apiKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error('Failed to save to database');
+            }
+
+            const newRecord = await response.json();
+            console.log('Video saved to Airtable:', newRecord);
+            console.log('Download from:', videoData.gofileUrl);
+            console.log('Title:', videoData.title);
+            console.log('Submitted by:', videoData.submitter);
+
+            return newRecord;
+        } catch (error) {
+            console.error('Airtable save error:', error);
+            throw error;
+        }
+    }
+
+    function updateUploadStatus(message, percent) {
+        document.getElementById('uploadStatus').textContent = message;
+        document.getElementById('progressFill').style.width = percent + '%';
+        document.getElementById('progressFill').textContent = percent + '%';
+    }
+
+    function showVideoAlert(message, type) {
+        const alertDiv = document.getElementById('upload-alert');
+        alertDiv.innerHTML = `<div class="alert alert-${type}" style="margin-bottom: 20px;">${message}</div>`;
+        
+        setTimeout(() => {
+            alertDiv.innerHTML = '';
+        }, 5000);
     }
 
     // Placeholder tag functions
@@ -2118,6 +2422,7 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
     document.addEventListener('DOMContentLoaded', async function() {
         await initializeAirtable();
         initializeVoiceRecording();
+        initializeVideoUpload();
         
         if (localStorage.getItem('isAdmin') === 'true') {
             isAdmin = true;
@@ -2126,7 +2431,6 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
         showSection('home');
     });
 
-    // Close modals when clicking outside
     const memoryModal = document.getElementById('memory-modal');
     const editModal = document.getElementById('edit-modal');
     
@@ -2142,7 +2446,6 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
         });
     }
 
-    // Enter key for tag input
     const tagInput = document.getElementById('new-tag-input');
     if (tagInput) {
         tagInput.addEventListener('keypress', function(e) {
@@ -2152,73 +2455,6 @@ if (url.includes('/image/upload/') && url.includes('.pdf')) {
             }
         });
     }
-        let pdfDocs = {};
-let currentPages = {};
-
-async function renderPdfPage(url, canvasId, action = 'init') {
-    if (!pdfDocs[canvasId]) {
-        const loadingTask = pdfjsLib.getDocument(url);
-        pdfDocs[canvasId] = await loadingTask.promise;
-        currentPages[canvasId] = 1;
-    }
-    
-    const pdf = pdfDocs[canvasId];
-    let pageNum = currentPages[canvasId];
-    
-    if (action === 'next' && pageNum < pdf.numPages) pageNum++;
-    if (action === 'prev' && pageNum > 1) pageNum--;
-    
-    currentPages[canvasId] = pageNum;
-    
-    const page = await pdf.getPage(pageNum);
-    const canvas = document.getElementById(canvasId);
-    const context = canvas.getContext('2d');
-    const viewport = page.getViewport({ scale: 1.5 });
-    
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    
-    await page.render({ canvasContext: context, viewport: viewport }).promise;
-    
-    document.getElementById(canvasId + '-info').textContent = `Page ${pageNum} of ${pdf.numPages}`;
-}
-
-// Auto-render when modal opens
-document.getElementById('memory-modal').addEventListener('DOMContentLoaded', function() {
-    const canvases = document.querySelectorAll('canvas[id^="pdf-"]');
-    canvases.forEach(canvas => {
-        const url = canvas.dataset.url;
-        if (url) renderPdfPage(url, canvas.id);
-    });
-});
-
-async function loadPdfPages(url, containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    // Toggle visibility
-    if (container.style.display === 'none') {
-        container.style.display = 'block';
-        container.innerHTML = '<p>Loading PDF pages...</p>';
-        
-        try {
-            // For Cloudinary PDFs uploaded as images, we can convert each page
-            const totalPages = 10; // Estimate, or you could use pdf.js to get actual count
-            let pagesHtml = '';
-            
-            for (let i = 1; i <= totalPages; i++) {
-                const pageUrl = url.replace('/image/upload/', `/image/upload/f_jpg,pg_${i}/`).replace('.pdf', '.jpg');
-                pagesHtml += `<img src="${pageUrl}" style="width: 100%; margin-bottom: 15px; border: 1px solid var(--border-color);" onerror="this.style.display='none'" alt="Page ${i}">`;
-            }
-            
-            container.innerHTML = pagesHtml;
-        } catch (error) {
-            container.innerHTML = '<p>Error loading PDF pages</p>';
-        }
-    } else {
-        container.style.display = 'none';
-    }
-}
-</script>
+    </script>
 </body>
 </html>
