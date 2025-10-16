@@ -2281,7 +2281,7 @@
 
         try {
             updateUploadStatus('Getting upload server...', 5);
-            const serverResponse = await fetch('/api/upload-video');
+            const serverResponse = await fetch('/api/upload-video', { method: 'POST' });
             const serverData = await serverResponse.json();
             
             if (serverData.status !== 'ok') {
