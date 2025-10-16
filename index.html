@@ -2281,14 +2281,14 @@
 
         try {
             updateUploadStatus('Getting upload server...', 5);
-            const serverResponse = await fetch('https://api.gofile.io/getServer');
+            const serverResponse = await fetch('/api/upload-video');
             const serverData = await serverResponse.json();
             
             if (serverData.status !== 'ok') {
                 throw new Error('Failed to get upload server');
             }
 
-            const server = serverData.data.server;
+            const uploadUrl = serverData.uploadUrl;
             updateUploadStatus('Uploading to server...', 10);
 
             const formData = new FormData();
@@ -2337,7 +2337,7 @@
                 throw new Error('Network error during upload');
             });
 
-            xhr.open('POST', `https://${server}.gofile.io/uploadFile`);
+            xhr.open('POST', uploadUrl);
             xhr.send(formData);
 
         } catch (error) {
